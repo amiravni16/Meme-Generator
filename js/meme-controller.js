@@ -2,6 +2,15 @@
 
 function initMemeController() {
     renderMeme()
+    initTextInput()
+}
+
+function initTextInput() {
+    const textInput = document.getElementById('meme-text-input')
+    textInput.addEventListener('input', () => {
+        setLineTxt(textInput.value)
+        renderMeme()
+    })
 }
 
 function renderMeme() {
@@ -22,7 +31,7 @@ function renderMeme() {
        
         ctx.drawImage(img, 0, 0)
 
-      
+       
         const line = meme.lines[meme.selectedLineIdx]
         ctx.font = `${line.size}px Arial`
         ctx.fillStyle = line.color
