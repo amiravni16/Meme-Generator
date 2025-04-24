@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meme Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="main.css">
 </head>
 <body class="bg-gray-100">
     <header class="bg-blue-600 text-white text-center py-4">
@@ -21,10 +21,12 @@
         <section id="editor">
             <h2 class="text-2xl font-semibold mb-4">Meme Editor</h2>
             <div id="editor-content" class="bg-white p-4 rounded shadow">
-                <!-- Editor content will be added here -->
+                <canvas id="meme-canvas" class="max-w-full h-auto"></canvas>
             </div>
         </section>
     </main>
+    <script src="js/meme-service.js"></script>
+    <script src="js/meme-controller.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
