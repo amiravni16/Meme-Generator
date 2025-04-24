@@ -37,6 +37,11 @@ function getImageById(imgId) {
     return gImgs.find(img => img.id === imgId)
 }
 
+function getImages() {
+    console.log('getImages called, returning:', gImgs)
+    return gImgs
+}
+
 function setMemeImg(imgId) {
     gMeme.selectedImgId = imgId
 }
