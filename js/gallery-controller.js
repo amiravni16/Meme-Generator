@@ -37,5 +37,7 @@ function renderGallery() {
 function onImgSelect(imgId) {
     console.log('onImgSelect called with imgId:', imgId)
     setMemeImg(imgId)
+    document.getElementById('gallery').style.display = 'none'
+    document.getElementById('editor').style.display = 'block'
     renderMeme()
 }
