@@ -3,6 +3,7 @@
 function initMemeController() {
     console.log('initMemeController called')
     initTextInput()
+    initDownloadLink()
 }
 
 function initTextInput() {
@@ -11,6 +12,29 @@ function initTextInput() {
         setLineTxt(textInput.value)
         renderMeme()
     })
+}
+
+function initDownloadLink() {
+    const downloadLink = document.getElementById('download-link')
+    downloadLink.addEventListener('click', (event) => {
+        event.preventDefault()
+        downloadMeme()
+    })
+}
+
+function downloadMeme() {
+    const canvas = document.getElementById('meme-canvas')
+    renderMeme()
+    console.log('downloadMeme called')
+    setTimeout(() => {
+        const dataUrl = canvas.toDataURL('image/png')
+        const link = document.createElement('a')
+        link.href = dataUrl
+        link.download = 'meme.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }, 100)
 }
 
 function renderMeme() {
