@@ -24,7 +24,7 @@ var gImgs = [
 var gMeme = {
     selectedImgId: 1,
     selectedLineIdx: 0,
-    lines: [{ txt: 'I sometimes eat Falafel', size: 20, color: 'red' }]
+    lines: [{ txt: 'I sometimes eat Falafel', size: 20, color: '#ff0000' }]
 }
 
 var gKeywordSearchCountMap = { funny: 12, cat: 16, baby: 2 }
@@ -48,4 +48,8 @@ function setImg(imgId) {
 
 function setLineTxt(txt) {
     gMeme.lines[gMeme.selectedLineIdx].txt = txt
+}
+
+function setColor(color) {
+    gMeme.lines[gMeme.selectedLineIdx].color = color
 }

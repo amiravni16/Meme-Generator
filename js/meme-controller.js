@@ -3,6 +3,7 @@
 function initMemeController() {
     console.log('initMemeController called')
     initTextInput()
+    initColorPicker()
     initDownloadLink()
 }
 
@@ -10,6 +11,14 @@ function initTextInput() {
     const textInput = document.getElementById('meme-text-input')
     textInput.addEventListener('input', () => {
         setLineTxt(textInput.value)
+        renderMeme()
+    })
+}
+
+function initColorPicker() {
+    const colorPicker = document.getElementById('font-color')
+    colorPicker.addEventListener('input', () => {
+        setColor(colorPicker.value)
         renderMeme()
     })
 }
@@ -25,7 +34,6 @@ function initDownloadLink() {
 function downloadMeme() {
     const canvas = document.getElementById('meme-canvas')
     renderMeme()
-    console.log('downloadMeme called')
     setTimeout(() => {
         const dataUrl = canvas.toDataURL('image/png')
         const link = document.createElement('a')
