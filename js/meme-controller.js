@@ -5,21 +5,22 @@ function initMemeController() {
     initTextInput()
     initColorPicker()
     initFontSizeControls()
+    initAddLineBtn()
     initDownloadLink()
 }
 
 function initTextInput() {
-    const textInput0 = document.getElementById('meme-text-input-0')
-    const textInput1 = document.getElementById('meme-text-input-1')
+    const textInputsContainer = document.getElementById('text-inputs')
+    const meme = getMeme()
     
-    textInput0.addEventListener('input', () => {
-        setLineTxt(textInput0.value, 0)
-        renderMeme()
-    })
-    
-    textInput1.addEventListener('input', () => {
-        setLineTxt(textInput1.value, 1)
-        renderMeme()
+    meme.lines.forEach((line, idx) => {
+        const input = document.getElementById(`meme-text-input-${idx}`)
+        if (input) {
+            input.addEventListener('input', () => {
+                setLineTxt(input.value, idx)
+                renderMeme()
+            })
+        }
     })
 }
 
@@ -81,6 +82,28 @@ function initFontSizeControls() {
     })
 }
 
+function initAddLineBtn() {
+    const addLineBtn = document.getElementById('add-line-btn')
+    addLineBtn.addEventListener('click', () => {
+        const newLineIdx = addLine()
+        const textInputsContainer = document.getElementById('text-inputs')
+        const newInput = document.createElement('input')
+        newInput.type = 'text'
+        newInput.id = `meme-text-input-${newLineIdx}`
+        newInput.className = 'w-full p-2 mb-4 border rounded'
+        newInput.placeholder = `Enter text for line ${newLineIdx + 1}`
+        newInput.value = 'New Line'
+        
+        newInput.addEventListener('input', () => {
+            setLineTxt(newInput.value, newLineIdx)
+            renderMeme()
+        })
+        
+        textInputsContainer.appendChild(newInput)
+        renderMeme()
+    })
+}
+
 function initDownloadLink() {
     const downloadLink = document.getElementById('download-link')
     downloadLink.addEventListener('click', (event) => {
@@ -121,23 +144,18 @@ function renderMeme() {
         canvas.height = img.height
         ctx.drawImage(img, 0, 0)
         
-   
-        const line0 = meme.lines[0]
-        ctx.font = `${line0.size}px Arial`
-        ctx.fillStyle = line0.color
-        ctx.strokeStyle = 'white'
-        ctx.lineWidth = 2
-        ctx.textAlign = 'center'
-        ctx.strokeText(line0.txt, canvas.width / 2, 50)
-        ctx.fillText(line0.txt, canvas.width / 2, 50)
-    
-        const line1 = meme.lines[1]
-        ctx.font = `${line1.size}px Arial`
-        ctx.fillStyle = line1.color
-        ctx.strokeStyle = 'white'
-        ctx.lineWidth = 2
-        ctx.textAlign = 'center'
-        ctx.strokeText(line1.txt, canvas.width / 2, canvas.height - 40)
-        ctx.fillText(line1.txt, canvas.width / 2, canvas.height - 40)
+        meme.lines.forEach((line, idx) => {
+            const totalLines = meme.lines.length
+            const spacing = (canvas.height - 100) / (totalLines + 1)
+            const yPos = 50 + (idx + 1) * spacing
+            
+            ctx.font = `${line.size}px Arial`
+            ctx.fillStyle = line.color
+            ctx.strokeStyle = 'white'
+            ctx.lineWidth = 2
+            ctx.textAlign = 'center'
+            ctx.strokeText(line.txt, canvas.width / 2, yPos)
+            ctx.fillText(line.txt, canvas.width / 2, yPos)
+        })
     }
 }

@@ -26,7 +26,7 @@ var gMeme = {
     selectedLineIdx: 0,
     lines: [
         { txt: 'I sometimes eat Falafel', size: 20, color: '#ff0000' },
-        { txt: 'And it\'s delicious!', size: 20, color: '#ff0000' }
+        { txt: "And it's delicious!", size: 20, color: '#ff0000' }
     ]
 }
 
@@ -59,4 +59,10 @@ function setColor(color, lineIdx) {
 
 function setFontSize(size, lineIdx) {
     gMeme.lines[lineIdx].size = Math.max(10, size)
+}
+
+function addLine() {
+    const newLine = { txt: 'New Line', size: 20, color: '#ff0000' }
+    gMeme.lines.push(newLine)
+    return gMeme.lines.length - 1
 }
