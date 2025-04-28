@@ -9,9 +9,16 @@ function initMemeController() {
 }
 
 function initTextInput() {
-    const textInput = document.getElementById('meme-text-input')
-    textInput.addEventListener('input', () => {
-        setLineTxt(textInput.value)
+    const textInput0 = document.getElementById('meme-text-input-0')
+    const textInput1 = document.getElementById('meme-text-input-1')
+    
+    textInput0.addEventListener('input', () => {
+        setLineTxt(textInput0.value, 0)
+        renderMeme()
+    })
+    
+    textInput1.addEventListener('input', () => {
+        setLineTxt(textInput1.value, 1)
         renderMeme()
     })
 }
@@ -19,7 +26,7 @@ function initTextInput() {
 function initColorPicker() {
     const colorPicker = document.getElementById('font-color')
     colorPicker.addEventListener('input', () => {
-        setColor(colorPicker.value)
+        setColor(colorPicker.value, getMeme().selectedLineIdx)
         renderMeme()
     })
 }
@@ -33,7 +40,7 @@ function initFontSizeControls() {
         const meme = getMeme()
         const currentSize = meme.lines[meme.selectedLineIdx].size
         const newSize = currentSize + 2
-        setFontSize(newSize)
+        setFontSize(newSize, meme.selectedLineIdx)
         fontSizeInput.value = newSize
         renderMeme()
     })
@@ -42,7 +49,7 @@ function initFontSizeControls() {
         const meme = getMeme()
         const currentSize = meme.lines[meme.selectedLineIdx].size
         const newSize = currentSize - 2
-        setFontSize(newSize)
+        setFontSize(newSize, meme.selectedLineIdx)
         fontSizeInput.value = newSize
         renderMeme()
     })
@@ -51,7 +58,7 @@ function initFontSizeControls() {
         const inputValue = fontSizeInput.value
         const newSize = parseInt(inputValue)
         if (!isNaN(newSize)) {
-            setFontSize(newSize)
+            setFontSize(newSize, getMeme().selectedLineIdx)
             renderMeme()
         } else {
             fontSizeInput.value = getMeme().lines[getMeme().selectedLineIdx].size
@@ -113,10 +120,24 @@ function renderMeme() {
         canvas.width = img.width
         canvas.height = img.height
         ctx.drawImage(img, 0, 0)
-        const line = meme.lines[meme.selectedLineIdx]
-        ctx.font = `${line.size}px Arial`
-        ctx.fillStyle = line.color
+        
+   
+        const line0 = meme.lines[0]
+        ctx.font = `${line0.size}px Arial`
+        ctx.fillStyle = line0.color
+        ctx.strokeStyle = 'white'
+        ctx.lineWidth = 2
         ctx.textAlign = 'center'
-        ctx.fillText(line.txt, canvas.width / 2, 50)
+        ctx.strokeText(line0.txt, canvas.width / 2, 50)
+        ctx.fillText(line0.txt, canvas.width / 2, 50)
+    
+        const line1 = meme.lines[1]
+        ctx.font = `${line1.size}px Arial`
+        ctx.fillStyle = line1.color
+        ctx.strokeStyle = 'white'
+        ctx.lineWidth = 2
+        ctx.textAlign = 'center'
+        ctx.strokeText(line1.txt, canvas.width / 2, canvas.height - 40)
+        ctx.fillText(line1.txt, canvas.width / 2, canvas.height - 40)
     }
 }
