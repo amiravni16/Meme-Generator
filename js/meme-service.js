@@ -42,7 +42,7 @@ function getImages() {
     return gImgs
 }
 
-function setMemeImg(imgId) {
+function setImg(imgId) {
     gMeme.selectedImgId = imgId
 }
 
