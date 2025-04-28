@@ -4,6 +4,7 @@ function initMemeController() {
     console.log('initMemeController called')
     initTextInput()
     initColorPicker()
+    initFontSizeControls()
     initDownloadLink()
 }
 
@@ -20,6 +21,56 @@ function initColorPicker() {
     colorPicker.addEventListener('input', () => {
         setColor(colorPicker.value)
         renderMeme()
+    })
+}
+
+function initFontSizeControls() {
+    const increaseBtn = document.getElementById('increase-font')
+    const decreaseBtn = document.getElementById('decrease-font')
+    const fontSizeInput = document.getElementById('font-size-input')
+    
+    increaseBtn.addEventListener('click', () => {
+        const meme = getMeme()
+        const currentSize = meme.lines[meme.selectedLineIdx].size
+        const newSize = currentSize + 2
+        setFontSize(newSize)
+        fontSizeInput.value = newSize
+        renderMeme()
+    })
+    
+    decreaseBtn.addEventListener('click', () => {
+        const meme = getMeme()
+        const currentSize = meme.lines[meme.selectedLineIdx].size
+        const newSize = currentSize - 2
+        setFontSize(newSize)
+        fontSizeInput.value = newSize
+        renderMeme()
+    })
+    
+    fontSizeInput.addEventListener('input', () => {
+        const inputValue = fontSizeInput.value
+        const newSize = parseInt(inputValue)
+        if (!isNaN(newSize)) {
+            setFontSize(newSize)
+            renderMeme()
+        } else {
+            fontSizeInput.value = getMeme().lines[getMeme().selectedLineIdx].size
+        }
+    })
+    
+    fontSizeInput.addEventListener('keypress', (event) => {
+        const charCode = event.charCode
+        if (charCode < 48 || charCode > 57) {
+            event.preventDefault()
+        }
+    })
+    
+    fontSizeInput.addEventListener('blur', () => {
+        const meme = getMeme()
+        const currentSize = meme.lines[meme.selectedLineIdx].size
+        if (!fontSizeInput.value || isNaN(parseInt(fontSizeInput.value))) {
+            fontSizeInput.value = currentSize
+        }
     })
 }
 

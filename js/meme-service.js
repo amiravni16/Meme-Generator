@@ -53,3 +53,7 @@ function setLineTxt(txt) {
 function setColor(color) {
     gMeme.lines[gMeme.selectedLineIdx].color = color
 }
+
+function setFontSize(size) {
+    gMeme.lines[gMeme.selectedLineIdx].size = Math.max(10, size)
+}
