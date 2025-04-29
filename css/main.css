@@ -1,11 +1,9 @@
-header {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
-}
-
-#gallery-content, #editor-content {
-    min-height: 200px
-}
-
-.text-center {
-    text-align: center
-}
+@import url('./setup/vars.css');
+@import url('./setup/media-queries.css');
+@import url('./base/base.css');
+@import url('./base/buttons.css');
+@import url('./base/helpers.css');
+@import url('./base/layout.css');
+@import url('./components/navigation.css');
+@import url('./components/header.css');
+/* @import url('./components/footer.css'); */

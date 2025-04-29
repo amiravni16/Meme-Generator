@@ -1,0 +1,152 @@
+.search-bar {
+    margin-bottom: 15px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* (desktop) */
+    gap: 15px;
+}
+
+/* Mobile (≤640px): */
+@media (max-width: 640px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; 
+    }
+
+    section#gallery h2,
+    section#editor h2 {
+        font-size: 1.5rem; 
+        margin-bottom: 10px;
+    }
+
+    .search-bar {
+        margin-bottom: 10px;
+    }
+
+    .search-bar input {
+        padding: 12px; 
+        font-size: 1rem;
+    }
+
+    .gallery-item {
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        padding: 5px; 
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+}
+
+.gallery-item {
+    width: 100%;
+    aspect-ratio: 1 / 1; 
+    overflow: hidden;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.gallery-item img:hover {
+    transform: scale(1.05);
+}
+
+#editor-content {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile (≤640px): */
+@media (max-width: 640px) {
+    #editor-content {
+        padding: 10px; 
+    }
+
+    .canvas-container {
+        margin-bottom: 15px;
+    }
+
+    .editor-controls {
+        gap: 15px;
+    }
+
+    .editor-controls input[type="text"],
+    .editor-controls input[type="color"] {
+        padding: 12px; 
+        font-size: 1rem;
+    }
+
+    .editor-controls .button-group button {
+        padding: 12px 20px; 
+        font-size: 1rem;
+    }
+
+    .font-controls {
+        gap: 10px;
+    }
+
+    .font-controls button {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .font-controls input[type="text"] {
+        width: 60px;
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    #download-link {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+}
+
+.canvas-container {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+#meme-canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.editor-controls {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.editor-controls .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.font-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}

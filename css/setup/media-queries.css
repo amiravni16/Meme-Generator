@@ -1,0 +1,56 @@
+/* Tablet (641px to 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+    header .container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    header h1 {
+        font-size: 2rem;
+        text-align: left;
+    }
+
+    header nav ul {
+        flex-direction: row;
+        margin: 0;
+    }
+
+    header nav ul li {
+        margin: 0 10px;
+    }
+
+    section#gallery h2,
+    section#editor h2 {
+        font-size: 1.5rem;
+        text-align: left;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Desktop (≥1025px) */
+@media (min-width: 1025px) {
+    header h1 {
+        font-size: 2.25rem;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(4, 1fr); 
+    }
+
+    #editor-content {
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .canvas-container {
+        width: 66.67%;
+        margin-bottom: 0;
+    }
+
+    .editor-controls {
+        width: 33.33%;
+    }
+}

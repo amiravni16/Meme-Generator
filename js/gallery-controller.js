@@ -8,19 +8,22 @@ function initGalleryController() {
 function renderGallery() {
     console.log('renderGallery called')
     const gallery = document.getElementById('gallery-content')
-    const imgs = getImages().slice(0, 2) // For testing, limit to 2 images
+    const imgs = getImages()
     console.log('Images to render:', imgs)
     
-    const htmlArray = imgs.map(img => {
-        const imgHtml = `<img src="${img.url}" alt="Meme Image ${img.id}" class="w-full h-32 object-cover rounded cursor-pointer" onclick="onImgSelect(${img.id})">`
+    let htmlStr = ''
+    imgs.forEach(img => {
+        const imgHtml = `
+            <div class="gallery-item">
+                <img src="${img.url}" alt="Meme Image ${img.id}" onclick="onImgSelect(${img.id})">
+            </div>
+        `
         console.log('Generated HTML for image:', img.id, imgHtml)
-        return imgHtml
+        htmlStr += imgHtml
     })
     
-    const html = htmlArray.join('')
-    console.log('Combined HTML:', html)
-    
-    gallery.innerHTML = html
+    console.log('Combined HTML:', htmlStr)
+    gallery.innerHTML = htmlStr
     console.log('Gallery HTML set:', gallery.innerHTML)
     
     setTimeout(() => {
