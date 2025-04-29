@@ -6,21 +6,16 @@ function initMemeController() {
     initColorPicker()
     initFontSizeControls()
     initAddLineBtn()
+    initSwitchLineBtn()
     initDownloadLink()
+    updateSelectedLineUI()
 }
 
 function initTextInput() {
-    const textInputsContainer = document.getElementById('text-inputs')
-    const meme = getMeme()
-    
-    meme.lines.forEach((line, idx) => {
-        const input = document.getElementById(`meme-text-input-${idx}`)
-        if (input) {
-            input.addEventListener('input', () => {
-                setLineTxt(input.value, idx)
-                renderMeme()
-            })
-        }
+    const textInput = document.getElementById('meme-text-input')
+    textInput.addEventListener('input', () => {
+        setLineTxt(textInput.value, getMeme().selectedLineIdx)
+        renderMeme()
     })
 }
 
@@ -86,22 +81,32 @@ function initAddLineBtn() {
     const addLineBtn = document.getElementById('add-line-btn')
     addLineBtn.addEventListener('click', () => {
         const newLineIdx = addLine()
-        const textInputsContainer = document.getElementById('text-inputs')
-        const newInput = document.createElement('input')
-        newInput.type = 'text'
-        newInput.id = `meme-text-input-${newLineIdx}`
-        newInput.className = 'w-full p-2 mb-4 border rounded'
-        newInput.placeholder = `Enter text for line ${newLineIdx + 1}`
-        newInput.value = 'New Line'
-        
-        newInput.addEventListener('input', () => {
-            setLineTxt(newInput.value, newLineIdx)
-            renderMeme()
-        })
-        
-        textInputsContainer.appendChild(newInput)
+        switchLine()
+        updateSelectedLineUI()
         renderMeme()
     })
+}
+
+function initSwitchLineBtn() {
+    const switchLineBtn = document.getElementById('switch-line-btn')
+    switchLineBtn.addEventListener('click', () => {
+        switchLine()
+        updateSelectedLineUI()
+        updateFontSizeDisplay()
+        renderMeme()
+    })
+}
+
+function updateSelectedLineUI() {
+    const meme = getMeme()
+    const textInput = document.getElementById('meme-text-input')
+    textInput.value = meme.lines[meme.selectedLineIdx].txt
+}
+
+function updateFontSizeDisplay() {
+    const meme = getMeme()
+    const fontSizeInput = document.getElementById('font-size-input')
+    fontSizeInput.value = meme.lines[meme.selectedLineIdx].size
 }
 
 function initDownloadLink() {
@@ -154,8 +159,24 @@ function renderMeme() {
             ctx.strokeStyle = 'white'
             ctx.lineWidth = 2
             ctx.textAlign = 'center'
+            
+            
             ctx.strokeText(line.txt, canvas.width / 2, yPos)
             ctx.fillText(line.txt, canvas.width / 2, yPos)
+            
+  
+            if (idx === meme.selectedLineIdx) {
+                const textWidth = ctx.measureText(line.txt).width
+                const padding = 10
+                const boxWidth = textWidth + padding * 2
+                const boxHeight = line.size + padding
+                const boxX = (canvas.width - boxWidth) / 2
+                const boxY = yPos - line.size - padding / 2
+                
+                ctx.strokeStyle = 'white'
+                ctx.lineWidth = 2
+                ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
+            }
         })
     }
 }

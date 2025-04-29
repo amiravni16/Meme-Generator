@@ -20,11 +20,11 @@
         <section id="editor" style="display: none;">
             <h2 class="text-2xl font-semibold mb-4">Meme Editor</h2>
             <div id="editor-content" class="bg-white p-4 rounded shadow">
-                <div id="text-inputs">
-                    <input type="text" id="meme-text-input-0" class="w-full p-2 mb-4 border rounded" placeholder="Enter top text" value="I sometimes eat Falafel">
-                    <input type="text" id="meme-text-input-1" class="w-full p-2 mb-4 border rounded" placeholder="Enter bottom text" value="And it's delicious!">
+                <input type="text" id="meme-text-input" class="w-full p-2 mb-4 border rounded border-gray-300" placeholder="Enter text for the selected line" value="I sometimes eat Falafel">
+                <div class="mb-4 flex gap-2">
+                    <button id="add-line-btn" class="p-2 bg-green-500 text-white rounded hover:bg-green-600">Add Line</button>
+                    <button id="switch-line-btn" class="p-2 bg-purple-500 text-white rounded hover:bg-purple-600">Switch Line</button>
                 </div>
-                <button id="add-line-btn" class="mb-4 p-2 bg-green-500 text-white rounded hover:bg-green-600">Add Line</button>
                 <div class="mb-4 flex items-center gap-2">
                     <label for="font-color" class="mr-2">Font Color:</label>
                     <input type="color" id="font-color" value="#ff0000">

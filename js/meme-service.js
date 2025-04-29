@@ -66,3 +66,8 @@ function addLine() {
     gMeme.lines.push(newLine)
     return gMeme.lines.length - 1
 }
+
+function switchLine() {
+    const totalLines = gMeme.lines.length
+    gMeme.selectedLineIdx = (gMeme.selectedLineIdx + 1) % totalLines
+}
