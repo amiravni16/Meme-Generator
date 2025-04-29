@@ -25,8 +25,8 @@ var gMeme = {
     selectedImgId: 1,
     selectedLineIdx: 0,
     lines: [
-        { txt: 'I sometimes eat Falafel', size: 20, color: '#ff0000' },
-        { txt: "And it's delicious!", size: 20, color: '#ff0000' }
+        { txt: 'I sometimes eat Falafel', size: 20, color: '#ff0000', x: 0, y: 0, width: 0, height: 0 },
+        { txt: "And it's delicious!", size: 20, color: '#ff0000', x: 0, y: 0, width: 0, height: 0 }
     ]
 }
 
@@ -62,7 +62,7 @@ function setFontSize(size, lineIdx) {
 }
 
 function addLine() {
-    const newLine = { txt: 'New Line', size: 20, color: '#ff0000' }
+    const newLine = { txt: 'New Line', size: 20, color: '#ff0000', x: 0, y: 0, width: 0, height: 0 }
     gMeme.lines.push(newLine)
     return gMeme.lines.length - 1
 }
@@ -70,4 +70,16 @@ function addLine() {
 function switchLine() {
     const totalLines = gMeme.lines.length
     gMeme.selectedLineIdx = (gMeme.selectedLineIdx + 1) % totalLines
+}
+
+function setLinePos(lineIdx, x, y, width, height) {
+    const line = gMeme.lines[lineIdx]
+    line.x = x
+    line.y = y
+    line.width = width
+    line.height = height
+}
+
+function setSelectedLine(lineIdx) {
+    gMeme.selectedLineIdx = lineIdx
 }

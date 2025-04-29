@@ -7,8 +7,11 @@ function initMemeController() {
     initFontSizeControls()
     initAddLineBtn()
     initSwitchLineBtn()
+    initCanvasClick()
     initDownloadLink()
     updateSelectedLineUI()
+    updateFontSizeDisplay()
+    updateFontColorDisplay()
 }
 
 function initTextInput() {
@@ -83,6 +86,8 @@ function initAddLineBtn() {
         const newLineIdx = addLine()
         switchLine()
         updateSelectedLineUI()
+        updateFontSizeDisplay()
+        updateFontColorDisplay()
         renderMeme()
     })
 }
@@ -93,7 +98,40 @@ function initSwitchLineBtn() {
         switchLine()
         updateSelectedLineUI()
         updateFontSizeDisplay()
+        updateFontColorDisplay()
         renderMeme()
+    })
+}
+
+function initCanvasClick() {
+    const canvas = document.getElementById('meme-canvas')
+    canvas.addEventListener('click', (event) => {
+        const rect = canvas.getBoundingClientRect()
+        const clickX = event.clientX - rect.left
+        const clickY = event.clientY - rect.top
+        
+        const meme = getMeme()
+        let lineClicked = false
+        
+        meme.lines.forEach((line, idx) => {
+            if (
+                clickX >= line.x &&
+                clickX <= line.x + line.width &&
+                clickY >= line.y &&
+                clickY <= line.y + line.height
+            ) {
+                setSelectedLine(idx)
+                updateSelectedLineUI()
+                updateFontSizeDisplay()
+                updateFontColorDisplay()
+                renderMeme()
+                lineClicked = true
+            }
+        })
+        
+        if (!lineClicked) {
+            console.log('No line clicked at', clickX, clickY)
+        }
     })
 }
 
@@ -107,6 +145,12 @@ function updateFontSizeDisplay() {
     const meme = getMeme()
     const fontSizeInput = document.getElementById('font-size-input')
     fontSizeInput.value = meme.lines[meme.selectedLineIdx].size
+}
+
+function updateFontColorDisplay() {
+    const meme = getMeme()
+    const colorPicker = document.getElementById('font-color')
+    colorPicker.value = meme.lines[meme.selectedLineIdx].color
 }
 
 function initDownloadLink() {
@@ -161,18 +205,23 @@ function renderMeme() {
             ctx.textAlign = 'center'
             
             
+            const textWidth = ctx.measureText(line.txt).width
+            const textHeight = line.size
+            const padding = 10
+            const boxX = (canvas.width - textWidth) / 2
+            const boxY = yPos - line.size - padding / 2
+            const boxWidth = textWidth + padding * 2
+            const boxHeight = textHeight + padding
+            
+            
+            setLinePos(idx, boxX, boxY, boxWidth, boxHeight)
+            
+          
             ctx.strokeText(line.txt, canvas.width / 2, yPos)
             ctx.fillText(line.txt, canvas.width / 2, yPos)
             
-  
+           
             if (idx === meme.selectedLineIdx) {
-                const textWidth = ctx.measureText(line.txt).width
-                const padding = 10
-                const boxWidth = textWidth + padding * 2
-                const boxHeight = line.size + padding
-                const boxX = (canvas.width - boxWidth) / 2
-                const boxY = yPos - line.size - padding / 2
-                
                 ctx.strokeStyle = 'white'
                 ctx.lineWidth = 2
                 ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
