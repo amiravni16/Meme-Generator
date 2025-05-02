@@ -25,28 +25,38 @@ var gMeme = {
     selectedImgId: 1,
     selectedLineIdx: 0,
     lines: [
-        { txt: 'I sometimes eat Falafel', size: 20, color: '#ff0000', x: 0, y: 0, width: 0, height: 0 },
-        { txt: "And it's delicious!", size: 20, color: '#ff0000', x: 0, y: 0, width: 0, height: 0 }
+        {
+            txt: 'I sometimes eat Falafel',
+            size: 20,
+            color: '#ff0000',
+            x: 250,
+            y: 50,
+            boxX: 0,
+            boxY: 0,
+            boxWidth: 0,
+            boxHeight: 0,
+            fontFamily: 'Arial',
+            align: 'center'
+        }
     ]
 }
 
-var gKeywordSearchCountMap = { funny: 12, cat: 16, baby: 2 }
+function getImages() {
+    return gImgs
+}
 
 function getMeme() {
     return gMeme
 }
 
-function getImageById(imgId) {
-    return gImgs.find(img => img.id === imgId)
-}
-
-function getImages() {
-    console.log('getImages called, returning:', gImgs)
-    return gImgs
-}
-
 function setImg(imgId) {
     gMeme.selectedImgId = imgId
+    gMeme.lines = [{ txt: '', size: 20, color: '#ff0000', x: 250, y: 50, boxX: 0, boxY: 0, boxWidth: 0, boxHeight: 0, fontFamily: 'Arial', align: 'center' }]
+    gMeme.selectedLineIdx = 0
+}
+
+function getImageById(imgId) {
+    return gImgs.find(img => img.id === imgId)
 }
 
 function setLineTxt(txt, lineIdx) {
@@ -57,29 +67,46 @@ function setColor(color, lineIdx) {
     gMeme.lines[lineIdx].color = color
 }
 
-function setFontSize(size, lineIdx) {
-    gMeme.lines[lineIdx].size = Math.max(10, size)
-}
-
 function addLine() {
-    const newLine = { txt: 'New Line', size: 20, color: '#ff0000', x: 0, y: 0, width: 0, height: 0 }
-    gMeme.lines.push(newLine)
+    gMeme.lines.push({ txt: '', size: 20, color: '#ff0000', x: 250, y: 150, boxX: 0, boxY: 0, boxWidth: 0, boxHeight: 0, fontFamily: 'Arial', align: 'center' })
     return gMeme.lines.length - 1
 }
 
 function switchLine() {
-    const totalLines = gMeme.lines.length
-    gMeme.selectedLineIdx = (gMeme.selectedLineIdx + 1) % totalLines
+    const meme = getMeme()
+    meme.selectedLineIdx = (meme.selectedLineIdx + 1) % meme.lines.length
 }
 
-function setLinePos(lineIdx, x, y, width, height) {
+function setFontSize(size, lineIdx) {
+    gMeme.lines[lineIdx].size = size
+}
+
+function setFontFamily(fontFamily, lineIdx) {
+    gMeme.lines[lineIdx].fontFamily = fontFamily
+}
+
+function setAlignment(align, lineIdx) {
+    gMeme.lines[lineIdx].align = align
+}
+
+function setSelectedLine(idx) {
+    gMeme.selectedLineIdx = idx
+}
+
+function setLineBox(idx, boxX, boxY, boxWidth, boxHeight) {
+    const line = gMeme.lines[idx]
+    line.boxX = boxX
+    line.boxY = boxY
+    line.boxWidth = boxWidth
+    line.boxHeight = boxHeight
+}
+
+function adjustLinePosition(lineIdx, deltaY, canvasHeight) {
     const line = gMeme.lines[lineIdx]
-    line.x = x
-    line.y = y
-    line.width = width
-    line.height = height
-}
-
-function setSelectedLine(lineIdx) {
-    gMeme.selectedLineIdx = lineIdx
+    console.log(`Adjusting position for line ${lineIdx}, current y: ${line.y}, deltaY: ${deltaY}`)
+    const newY = line.y + deltaY
+    const minY = 0 + line.boxHeight / 2
+    const maxY = canvasHeight - line.boxHeight / 2
+    line.y = Math.max(minY, Math.min(newY, maxY))
+    console.log(`New y position: ${line.y}`)
 }

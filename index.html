@@ -9,11 +9,10 @@
 <body>
     <header>
         <div class="container">
-            <h1>Meme Generator</h1>
+            <h1>LOGO</h1>
             <nav>
                 <ul>
                     <li><a href="#">Gallery</a></li>
-                    <li><a href="#">Memes</a></li>
                     <li><a href="#">About</a></li>
                 </ul>
             </nav>
@@ -34,20 +33,50 @@
                 <div class="canvas-container">
                     <canvas id="meme-canvas"></canvas>
                 </div>
-                <div class="editor-controls">
-                    <input type="text" id="meme-text-input" placeholder="Enter text for the selected line" value="I sometimes eat Falafel">
-                    <div class="button-group">
-                        <button id="add-line-btn">Add Line</button>
-                        <button id="switch-line-btn">Switch Line</button>
+                <div class="controls-panel">
+                    <div class="control-row">
+                        <input type="text" id="meme-text-input" placeholder="Enter text for the selected line" value="I sometimes eat Falafel">
                     </div>
-                    <div class="font-controls">
-                        <label for="font-color">Font Color:</label>
-                        <input type="color" id="font-color" value="#ff0000">
-                        <button id="increase-font">+</button>
-                        <input type="text" id="font-size-input" value="20">
-                        <button id="decrease-font">-</button>
+                    <div class="control-row">
+                        <div class="line-controls">
+                            <button id="move-up-btn">↑</button>
+                            <button id="move-down-btn">↓</button>
+                            <button id="switch-line-btn">↕</button>
+                            <button id="add-line-btn">+</button>
+                            <button id="delete-line-btn">🗑️</button>
+                        </div>
                     </div>
-                    <a href="#" id="download-link">Download</a>
+                    <div class="control-row">
+                        <div class="font-controls">
+                            <label for="font-family">Font:</label>
+                            <select id="font-family">
+                                <option value="Arial">Arial</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Impact">Impact</option>
+                            </select>
+                            <label for="font-color">Color:</label>
+                            <input type="color" id="font-color" value="#ff0000">
+                            <button id="increase-font">A↑</button>
+                            <button id="decrease-font">A↓</button>
+                            <button id="align-left" class="align-btn">⬅️</button>
+                            <button id="align-center" class="align-btn">⏺️</button>
+                            <button id="align-right" class="align-btn">➡️</button>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <div class="emoji-controls">
+                            <button id="emoji1">😄</button>
+                            <button id="emoji2">😂</button>
+                            <button id="emoji3">😢</button>
+                            <button id="emoji4">😡</button>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <div class="action-controls">
+                            <button id="share-btn">Share</button>
+                            <a href="#" id="download-link">Download</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
