@@ -194,6 +194,83 @@ section {
     background-color: #8e24aa;
 }
 
+
+.controls-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#meme-text-input {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: white;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.line-controls button,
+.font-controls button,
+.emoji-controls button,
+.action-controls button,
+.action-controls a {
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: white;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.font-controls select,
+.font-controls input[type="color"] {
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: white;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.font-controls label {
+    margin-right: 5px;
+}
+
+.action-controls a {
+    text-decoration: none;
+    color: white;
+    padding: 12px 20px;
+    background-color: #ab47bc;
+    border-radius: 5px;
+    display: inline-block;
+    text-align: center;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.action-controls a:hover {
+    background-color: #8e24aa;
+}
+
 /* Mobile (≤640px) */
 @media (max-width: 640px) {
     .editor-layout {
@@ -290,79 +367,28 @@ section {
     }
 }
 
-
-.controls-panel {
+/* Styles for I'm flexible button */
+.search-bar {
     display: flex;
-    flex-direction: column;
-    gap: 15px; 
-    padding: 10px; 
-}
-
-.control-row {
-    display: flex;
-    align-items: center;
     gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
-#meme-text-input {
-    flex: 1;
-    padding: 12px;
+#flexible-btn {
+    padding: 12px 20px;
     font-size: 1rem;
     border: none;
-    border-radius: 5px;
-    background-color: #444; 
-    color: white; 
-    height: 48px; 
-    box-sizing: border-box;
-}
-
-.line-controls button,
-.font-controls button,
-.emoji-controls button,
-.action-controls button,
-.action-controls a {
-    padding: 12px; 
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #444; 
+    border-radius: 20px;
+    background-color: #1e90ff;
     color: white;
-    min-width: 48px; 
-    min-height: 48px; 
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box; 
+    white-space: nowrap;
 }
 
-.font-controls select,
-.font-controls input[type="color"] {
-    padding: 12px; 
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #444; 
-    color: white; 
-    height: 48px; 
-    box-sizing: border-box;
-}
-
-.font-controls label {
-    margin-right: 5px;
-}
-
-.action-controls a {
-    text-decoration: none;
-    color: white; 
-    padding: 12px 20px; 
-    background-color: #ab47bc;
-    border-radius: 5px;
-    display: inline-block;
-    text-align: center;
-    height: 48px; 
-    box-sizing: border-box;
-}
-
-.action-controls a:hover {
-    background-color: #8e24aa; 
+#flexible-btn:hover {
+    background-color: #1c86ee;
 }
