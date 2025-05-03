@@ -245,6 +245,7 @@ function renderMeme() {
     }
 
     const meme = getMeme()
+    const padding = 5 
     meme.lines.forEach((line, idx) => {
         gCtx.font = `${line.size}px ${line.fontFamily}`
         gCtx.fillStyle = line.color
@@ -256,15 +257,15 @@ function renderMeme() {
         const metrics = gCtx.measureText(line.txt)
         const ascent = metrics.actualBoundingBoxAscent || line.size
         const descent = metrics.actualBoundingBoxDescent || 0
-        const boxWidth = metrics.width
-        const boxHeight = ascent + descent
+        const boxWidth = metrics.width + 2 * padding
+        const boxHeight = ascent + descent + 2 * padding
         var boxX = line.x
         if (line.align === 'center') {
-            boxX -= boxWidth / 2
+            boxX -= (metrics.width / 2 + padding)
         } else if (line.align === 'right') {
-            boxX -= boxWidth
+            boxX -= (metrics.width + padding)
         }
-        const boxY = line.y - ascent
+        const boxY = line.y - ascent - padding
         setLineBox(idx, boxX, boxY, boxWidth, boxHeight)
 
         if (idx === selectedLineIdx) {
