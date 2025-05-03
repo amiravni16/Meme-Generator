@@ -5,12 +5,13 @@ console.log('gallery-controller.js loaded')
 function initGalleryController() {
     console.log('initGalleryController called')
     populateKeywordList()
+    renderKeywordCloud()
     renderGallery()
     renderSavedMemes()
     initSearchBar()
     initFlexibleBtn()
     initSaveBtn()
-    initImageUpload() 
+    initImageUpload()
 }
 
 function initImageUpload() {
@@ -37,17 +38,14 @@ function loadImageFromInput(ev, onImageReady) {
 
 function onImageUploaded(img) {
     const images = getImages()
-    const newImageId = images.length + 1 
+    const newImageId = images.length + 1
     const newImage = {
         id: newImageId,
         url: img.src,
-        keywords: ['custom'] 
+        keywords: ['custom']
     }
     images.push(newImage)
-
-    
     setImg(newImageId)
-   
     window.dispatchEvent(new Event('imageSelected'))
     document.getElementById('gallery').style.display = 'none'
     document.getElementById('saved-memes').style.display = 'none'
@@ -60,6 +58,48 @@ function populateKeywordList() {
     const keywords = [...new Set(images.flatMap(img => img.keywords))]
     const datalist = document.getElementById('keyword-list')
     datalist.innerHTML = keywords.map(keyword => `<option value="${keyword}">`).join('')
+}
+
+function renderKeywordCloud() {
+    const keywordPopularity = getKeywordPopularity()
+    const keywords = Object.keys(keywordPopularity)
+    const maxPopularity = Math.max(...Object.values(keywordPopularity))
+    const minPopularity = Math.min(...Object.values(keywordPopularity))
+    const maxFontSize = 40
+    const minFontSize = 16
+
+    const keywordCloud = document.getElementById('keyword-cloud')
+    const strHTMLs = keywords.map(keyword => {
+        const popularity = keywordPopularity[keyword]
+        let fontSize = minFontSize
+        if (maxPopularity !== minPopularity) {
+            fontSize = minFontSize + (popularity - minPopularity) * (maxFontSize - minFontSize) / (maxPopularity - minPopularity)
+        }
+        return `<span class="keyword" style="font-size: ${fontSize}px;" onclick="onKeywordClick('${keyword}')">${keyword}</span>`
+    })
+    keywordCloud.innerHTML = strHTMLs.join(' ')
+}
+
+function onKeywordClick(keyword) {
+    incrementKeywordPopularity(keyword)
+    const searchInput = document.getElementById('search-input')
+    searchInput.value = keyword
+    filterGallery(keyword)
+    renderKeywordCloud()
+}
+
+function filterGallery(keyword) {
+    const images = getImages()
+    const filteredImages = keyword ? images.filter(img => 
+        img.keywords.some(kw => kw.toLowerCase().includes(keyword.toLowerCase()))
+    ) : images
+    const galleryContent = document.getElementById('gallery-content')
+    const strHTMLs = filteredImages.map(img => `
+        <div class="gallery-item">
+            <img src="${img.url}" alt="Meme image ${img.id}" onclick="onImageSelect(${img.id})">
+        </div>
+    `)
+    galleryContent.innerHTML = strHTMLs.join('')
 }
 
 function renderGallery() {
@@ -125,15 +165,15 @@ function generateMemeThumbnail(meme) {
     })
 }
 
-function renderSavedMemes() {
+async function renderSavedMemes() {
     console.log('renderSavedMemes called')
     const savedMemes = loadSavedMemes()
     const savedMemesContent = document.getElementById('saved-memes-content')
     const strHTMLs = []
 
-    for (var idx = 0; idx < savedMemes.length; idx++) {
+    for (let idx = 0; idx < savedMemes.length; idx++) {
         const meme = savedMemes[idx]
-        const thumbnailUrl = generateMemeThumbnail(meme)
+        const thumbnailUrl = await generateMemeThumbnail(meme)
         strHTMLs.push(`
             <div class="gallery-item">
                 <img src="${thumbnailUrl}" alt="Saved meme ${idx}" onclick="onSavedMemeSelect(${idx})">
@@ -151,22 +191,13 @@ function initSearchBar() {
 
     searchInput.addEventListener('input', () => {
         const keyword = searchInput.value.toLowerCase()
-        const images = getImages()
-        const filteredImages = keyword ? images.filter(img => 
-            img.keywords.some(kw => kw.toLowerCase().includes(keyword))
-        ) : images
-        const galleryContent = document.getElementById('gallery-content')
-        const strHTMLs = filteredImages.map(img => `
-            <div class="gallery-item">
-                <img src="${img.url}" alt="Meme image ${img.id}" onclick="onImageSelect(${img.id})">
-            </div>
-        `)
-        galleryContent.innerHTML = strHTMLs.join('')
+        filterGallery(keyword)
     })
 
     clearFilterBtn.addEventListener('click', () => {
         searchInput.value = ''
         renderGallery()
+        renderKeywordCloud()
     })
 }
 
