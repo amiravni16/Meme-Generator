@@ -4,7 +4,21 @@ var gImgs = [
     { id: 1, url: 'img/1.jpg', keywords: ['funny', 'animal'] },
     { id: 2, url: 'img/2.jpg', keywords: ['happy', 'nature'] },
     { id: 3, url: 'img/3.jpg', keywords: ['bad', 'awkward'] },
-    { id: 4, url: 'img/4.jpg', keywords: ['sad', 'animal'] }
+    { id: 4, url: 'img/4.jpg', keywords: ['sad', 'animal'] },
+    { id: 5, url: 'img/5.jpg', keywords: ['funny', 'happy'] },
+    { id: 6, url: 'img/6.jpg', keywords: ['nature', 'awkward'] },
+    { id: 7, url: 'img/7.jpg', keywords: ['bad', 'sad'] },
+    { id: 8, url: 'img/8.jpg', keywords: ['funny', 'nature'] },
+    { id: 9, url: 'img/9.jpg', keywords: ['animal', 'happy'] },
+    { id: 10, url: 'img/10.jpg', keywords: ['bad', 'funny'] },
+    { id: 11, url: 'img/11.jpg', keywords: ['awkward', 'sad'] },
+    { id: 12, url: 'img/12.jpg', keywords: ['nature', 'animal'] },
+    { id: 13, url: 'img/13.jpg', keywords: ['happy', 'bad'] },
+    { id: 14, url: 'img/14.jpg', keywords: ['funny', 'sad'] },
+    { id: 15, url: 'img/15.jpg', keywords: ['animal', 'awkward'] },
+    { id: 16, url: 'img/16.jpg', keywords: ['nature', 'happy'] },
+    { id: 17, url: 'img/17.jpg', keywords: ['bad', 'animal'] },
+    { id: 18, url: 'img/18.jpg', keywords: ['funny', 'nature'] }
 ]
 
 var gMeme = {
@@ -127,7 +141,11 @@ function loadKeywordPopularity() {
         'funny': 10,
         'animal': 8,
         'bad': 6,
-        'happy': 5,
+        'awkward': 4,
+        'happy': 12,
+        'sad': 5,
+        'nature': 3,
+        'custom': 1
     }
     saveToStorage('keywordPopularity', initialPopularity)
     return initialPopularity

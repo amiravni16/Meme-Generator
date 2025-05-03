@@ -100,11 +100,13 @@ function filterGallery(keyword) {
         </div>
     `)
     galleryContent.innerHTML = strHTMLs.join('')
+    console.log(`Filtered gallery: ${filteredImages.length} images rendered with keyword "${keyword || 'none'}"`)
 }
 
 function renderGallery() {
     console.log('renderGallery called')
     const images = getImages()
+    console.log(`Rendering gallery with ${images.length} images`)
     const galleryContent = document.getElementById('gallery-content')
     const strHTMLs = images.map(img => `
         <div class="gallery-item">
@@ -112,6 +114,26 @@ function renderGallery() {
         </div>
     `)
     galleryContent.innerHTML = strHTMLs.join('')
+}
+
+async function renderSavedMemes() {
+    console.log('renderSavedMemes called')
+    const savedMemes = loadSavedMemes()
+    const savedMemesContent = document.getElementById('saved-memes-content')
+    const strHTMLs = []
+
+    for (let idx = 0; idx < savedMemes.length; idx++) {
+        const meme = savedMemes[idx]
+        const thumbnailUrl = await generateMemeThumbnail(meme)
+        strHTMLs.push(`
+            <div class="gallery-item">
+                <img src="${thumbnailUrl}" alt="Saved meme ${idx}" onclick="onSavedMemeSelect(${idx})">
+            </div>
+        `)
+    }
+
+    savedMemesContent.innerHTML = strHTMLs.join('')
+    document.getElementById('saved-memes').style.display = savedMemes.length > 0 ? 'block' : 'none'
 }
 
 function generateMemeThumbnail(meme) {
@@ -163,26 +185,6 @@ function generateMemeThumbnail(meme) {
             resolve(dataUrl)
         }
     })
-}
-
-async function renderSavedMemes() {
-    console.log('renderSavedMemes called')
-    const savedMemes = loadSavedMemes()
-    const savedMemesContent = document.getElementById('saved-memes-content')
-    const strHTMLs = []
-
-    for (let idx = 0; idx < savedMemes.length; idx++) {
-        const meme = savedMemes[idx]
-        const thumbnailUrl = await generateMemeThumbnail(meme)
-        strHTMLs.push(`
-            <div class="gallery-item">
-                <img src="${thumbnailUrl}" alt="Saved meme ${idx}" onclick="onSavedMemeSelect(${idx})">
-            </div>
-        `)
-    }
-
-    savedMemesContent.innerHTML = strHTMLs.join('')
-    document.getElementById('saved-memes').style.display = savedMemes.length > 0 ? 'block' : 'none'
 }
 
 function initSearchBar() {

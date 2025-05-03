@@ -17,3 +17,13 @@
 .keyword:hover {
     color: #ddd;
 }
+
+.inline-input {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 2px;
+    box-sizing: border-box;
+    outline: none;
+}

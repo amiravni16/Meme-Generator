@@ -8,13 +8,13 @@ var selectedLineIdx = 0
 var currentImageObj = null
 var gElCanvas = document.getElementById('meme-canvas')
 var gCtx = gElCanvas.getContext('2d')
+var gInlineInput = null
 
 function initMemeController() {
     console.log('initMemeController called')
     initEditorControls()
     initCanvasDragAndDrop()
-    preloadImage() 
-
+    preloadImage()
     window.addEventListener('imageSelected', () => {
         preloadImage()
         renderMeme()
@@ -37,8 +37,15 @@ function initEditorControls() {
     const textInput = document.getElementById('meme-text-input')
     textInput.addEventListener('input', () => {
         const meme = getMeme()
-        setLineTxt(textInput.value, meme.selectedLineIdx)
+        setLineTxt(textInput.value, meme.selectedLineIdx || 0)
         renderMeme()
+    })
+
+    textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            textInput.blur()
+            createInlineInput(selectedLineIdx)
+        }
     })
 
     const moveUpBtn = document.getElementById('move-up-btn')
@@ -68,7 +75,7 @@ function initEditorControls() {
         setSelectedLine(newLineIdx)
         selectedLineIdx = newLineIdx
         document.getElementById('meme-text-input').value = ''
-        renderMeme()
+        createInlineInput(newLineIdx)
     })
 
     const deleteLineBtn = document.getElementById('delete-line-btn')
@@ -184,6 +191,73 @@ function initEditorControls() {
     })
 }
 
+function createInlineInput(lineIdx) {
+    if (gInlineInput) {
+        gInlineInput.remove()
+        gInlineInput = null
+    }
+
+    const meme = getMeme()
+    const line = meme.lines[lineIdx]
+    const canvasRect = gElCanvas.getBoundingClientRect()
+
+    console.log('Creating inline input for line', lineIdx, 'at position:', { x: line.x, y: line.y, align: line.align })
+
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.className = 'inline-input'
+    input.value = line.txt
+    input.style.position = 'absolute'
+    input.style.fontSize = `${line.size}px`
+    input.style.fontFamily = line.fontFamily
+    input.style.color = line.color
+    input.style.background = 'rgba(255, 255, 255, 0.7)'
+    input.style.border = '1px solid #ccc'
+    input.style.borderRadius = '3px'
+    input.style.padding = '2px'
+    input.style.textAlign = line.align
+    input.style.boxSizing = 'border-box'
+    input.style.zIndex = '1000' 
+
+    gCtx.font = `${line.size}px ${line.fontFamily}`
+    const metrics = gCtx.measureText(line.txt || ' ')
+    const width = Math.max(metrics.width + 10, 50)
+    input.style.width = `${width}px`
+
+    let left = canvasRect.left + line.x + window.scrollX
+    if (line.align === 'center') {
+        left -= width / 2
+    } else if (line.align === 'right') {
+        left -= width
+    }
+    const top = canvasRect.top + line.y - (line.size / 2) + window.scrollY
+    input.style.left = `${left}px`
+    input.style.top = `${top}px`
+
+    input.addEventListener('input', () => {
+        setLineTxt(input.value, lineIdx)
+        renderMeme()
+    })
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            input.blur()
+        }
+    })
+
+    input.addEventListener('blur', () => {
+        console.log('Inline input blurred, removing...')
+        input.remove()
+        gInlineInput = null
+        renderMeme()
+    })
+
+    document.body.appendChild(input)
+    gInlineInput = input
+    input.focus()
+    console.log('Inline input created and appended:', input)
+}
+
 function initCanvasDragAndDrop() {
     const canvas = document.getElementById('meme-canvas')
     
@@ -193,7 +267,7 @@ function initCanvasDragAndDrop() {
         const mouseY = e.clientY - rect.top
 
         const meme = getMeme()
-        draggedLineIdx = meme.lines.findIndex(line => {
+        const clickedLineIdx = meme.lines.findIndex(line => {
             const left = line.boxX
             const right = line.boxX + line.boxWidth
             const top = line.boxY
@@ -201,21 +275,45 @@ function initCanvasDragAndDrop() {
             return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom
         })
 
-        if (draggedLineIdx !== -1) {
-            isDragging = true
+        console.log('Mouse down at:', { mouseX, mouseY }, 'Clicked line:', clickedLineIdx)
+
+        if (clickedLineIdx !== -1) {
+            draggedLineIdx = clickedLineIdx
             const line = meme.lines[draggedLineIdx]
             dragOffsetX = mouseX - line.x
             dragOffsetY = mouseY - line.y
-            selectedLineIdx = draggedLineIdx
-            setSelectedLine(draggedLineIdx)
+            selectedLineIdx = clickedLineIdx
+            setSelectedLine(selectedLineIdx)
             document.getElementById('meme-text-input').value = line.txt
             renderMeme()
         }
     })
 
-    canvas.addEventListener('mousemove', (e) => {
-        if (!isDragging) return
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
 
+        const meme = getMeme()
+        const clickedLineIdx = meme.lines.findIndex(line => {
+            const left = line.boxX
+            const right = line.boxX + line.boxWidth
+            const top = line.boxY
+            const bottom = line.boxY + line.boxHeight
+            return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom
+        })
+
+        console.log('Click at:', { mouseX, mouseY }, 'Clicked line:', clickedLineIdx)
+
+        if (clickedLineIdx !== -1 && !isDragging) {
+            createInlineInput(clickedLineIdx)
+        }
+    })
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (draggedLineIdx === -1) return
+
+        isDragging = true
         const rect = canvas.getBoundingClientRect()
         const mouseX = e.clientX - rect.left
         const mouseY = e.clientY - rect.top
@@ -260,7 +358,7 @@ function renderMeme() {
 
         gCtx.fillText(line.txt, line.x, line.y)
 
-        const metrics = gCtx.measureText(line.txt)
+        const metrics = gCtx.measureText(line.txt || ' ')
         const ascent = metrics.actualBoundingBoxAscent || line.size
         const descent = metrics.actualBoundingBoxDescent || 0
         const boxWidth = metrics.width + 2 * padding
@@ -274,7 +372,7 @@ function renderMeme() {
         const boxY = line.y - ascent - padding
         setLineBox(idx, boxX, boxY, boxWidth, boxHeight)
 
-        if (idx === selectedLineIdx) {
+        if (idx === selectedLineIdx && !gInlineInput) {
             gCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
             gCtx.lineWidth = 2
             gCtx.strokeRect(boxX, boxY, boxWidth, boxHeight)
