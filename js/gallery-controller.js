@@ -1,5 +1,7 @@
 'use strict'
 
+console.log('gallery-controller.js loaded')
+
 function initGalleryController() {
     console.log('initGalleryController called')
     populateKeywordList()
@@ -12,7 +14,7 @@ function initGalleryController() {
 
 function populateKeywordList() {
     const images = getImages()
-    const keywords = [...new Set(images.flatMap(img => img.keywords))] // Unique keywords
+    const keywords = [...new Set(images.flatMap(img => img.keywords))]
     const datalist = document.getElementById('keyword-list')
     datalist.innerHTML = keywords.map(keyword => `<option value="${keyword}">`).join('')
 }
@@ -80,15 +82,15 @@ function generateMemeThumbnail(meme) {
     })
 }
 
-async function renderSavedMemes() {
+function renderSavedMemes() {
     console.log('renderSavedMemes called')
     const savedMemes = loadSavedMemes()
     const savedMemesContent = document.getElementById('saved-memes-content')
     const strHTMLs = []
 
-    for (let idx = 0; idx < savedMemes.length; idx++) {
+    for (var idx = 0; idx < savedMemes.length; idx++) {
         const meme = savedMemes[idx]
-        const thumbnailUrl = await generateMemeThumbnail(meme)
+        const thumbnailUrl = generateMemeThumbnail(meme)
         strHTMLs.push(`
             <div class="gallery-item">
                 <img src="${thumbnailUrl}" alt="Saved meme ${idx}" onclick="onSavedMemeSelect(${idx})">
@@ -121,7 +123,7 @@ function initSearchBar() {
 
     clearFilterBtn.addEventListener('click', () => {
         searchInput.value = ''
-        renderGallery() // Reset to show all images
+        renderGallery()
     })
 }
 

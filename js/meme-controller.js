@@ -1,317 +1,278 @@
 'use strict'
 
+var isDragging = false
+var draggedLineIdx = -1
+var dragOffsetX = 0
+var dragOffsetY = 0
+var selectedLineIdx = 0
+var currentImageObj = null 
+
 function initMemeController() {
     console.log('initMemeController called')
-    initTextInput()
-    initColorPicker()
-    initFontSizeControls()
-    initAddLineBtn()
-    initSwitchLineBtn()
-    initCanvasClick()
-    initDownloadLink()
-    initFontFamilyControl()
-    initAlignmentControls()
-    initDeleteLineBtn()
-    initEmojiControls()
-    initShareBtn()
-    initPositionControls()
-    updateSelectedLineUI()
-    updateFontSizeDisplay()
-    updateFontColorDisplay()
+    initEditorControls()
+    initCanvasDragAndDrop()
+    preloadImage() 
 }
 
-function initTextInput() {
-    const textInput = document.getElementById('meme-text-input')
-    textInput.addEventListener('input', () => {
-        setLineTxt(textInput.value, getMeme().selectedLineIdx)
-        renderMeme()
-    })
-}
-
-function initColorPicker() {
-    const colorPicker = document.getElementById('font-color')
-    colorPicker.addEventListener('input', () => {
-        setColor(colorPicker.value, getMeme().selectedLineIdx)
-        renderMeme()
-    })
-}
-
-function initFontSizeControls() {
-    const increaseBtn = document.getElementById('increase-font')
-    const decreaseBtn = document.getElementById('decrease-font')
-    
-    increaseBtn.addEventListener('click', () => {
-        const meme = getMeme()
-        const currentSize = meme.lines[meme.selectedLineIdx].size
-        const newSize = currentSize + 2
-        setFontSize(newSize, meme.selectedLineIdx)
-        renderMeme()
-    })
-    
-    decreaseBtn.addEventListener('click', () => {
-        const meme = getMeme()
-        const currentSize = meme.lines[meme.selectedLineIdx].size
-        const newSize = Math.max(currentSize - 2, 10)
-        setFontSize(newSize, meme.selectedLineIdx)
-        renderMeme()
-    })
-}
-
-function initAddLineBtn() {
-    const addLineBtn = document.getElementById('add-line-btn')
-    addLineBtn.addEventListener('click', () => {
-        const newLineIdx = addLine()
-        switchLine()
-        updateSelectedLineUI()
-        updateFontSizeDisplay()
-        updateFontColorDisplay()
-        renderMeme()
-    })
-}
-
-function initSwitchLineBtn() {
-    const switchLineBtn = document.getElementById('switch-line-btn')
-    switchLineBtn.addEventListener('click', () => {
-        switchLine()
-        updateSelectedLineUI()
-        updateFontSizeDisplay()
-        updateFontColorDisplay()
-        renderMeme()
-    })
-}
-
-function initCanvasClick() {
-    const canvas = document.getElementById('meme-canvas')
-    const ctx = canvas.getContext('2d')
-    canvas.addEventListener('click', (event) => {
-        const rect = canvas.getBoundingClientRect()
-        const clickX = event.clientX - rect.left
-        const clickY = event.clientY - rect.top
-        
-        const meme = getMeme()
-        let lineClicked = false
-        
-        meme.lines.forEach((line, idx) => {
-            ctx.font = `${line.size}px ${line.fontFamily}`
-            const textWidth = ctx.measureText(line.txt).width
-            let adjustedX = line.boxX
-            if (line.align === 'center') {
-                adjustedX = line.boxX + (line.boxWidth - textWidth) / 2
-            } else if (line.align === 'right') {
-                adjustedX = line.boxX + (line.boxWidth - textWidth)
-            }
-            if (
-                clickX >= line.boxX &&
-                clickX <= line.boxX + line.boxWidth &&
-                clickY >= line.boxY &&
-                clickY <= line.boxY + line.boxHeight
-            ) {
-                setSelectedLine(idx)
-                updateSelectedLineUI()
-                updateFontSizeDisplay()
-                updateFontColorDisplay()
-                renderMeme()
-                lineClicked = true
-            }
-        })
-        
-        if (!lineClicked) {
-            console.log('No line clicked at', clickX, clickY)
-        }
-    })
-}
-
-function updateSelectedLineUI() {
+function preloadImage() {
     const meme = getMeme()
-    const textInput = document.getElementById('meme-text-input')
-    textInput.value = meme.lines[meme.selectedLineIdx].txt
-}
-
-function updateFontSizeDisplay() {
-}
-
-function updateFontColorDisplay() {
-    const meme = getMeme()
-    const colorPicker = document.getElementById('font-color')
-    colorPicker.value = meme.lines[meme.selectedLineIdx].color
-}
-
-function initDownloadLink() {
-    const downloadLink = document.getElementById('download-link')
-    downloadLink.addEventListener('click', (event) => {
-        event.preventDefault()
-        downloadMeme()
-    })
-}
-
-function downloadMeme() {
-    const canvas = document.getElementById('meme-canvas')
-    renderMeme()
-    setTimeout(() => {
-        const dataUrl = canvas.toDataURL('image/png')
-        const link = document.createElement('a')
-        link.href = dataUrl
-        link.download = 'meme.png'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-    }, 100)
-}
-
-function renderMeme() {
-    console.log('renderMeme called')
-    const meme = getMeme()
-    const imgData = getImageById(meme.selectedImgId)
-    console.log('Rendering image:', imgData)
-    
-    const canvas = document.getElementById('meme-canvas')
-    const ctx = canvas.getContext('2d')
-
-    const img = new Image()
-    img.src = imgData.url
-    img.onerror = () => console.error('Failed to load image in editor:', imgData.url)
-    img.onload = () => {
-        console.log('Image loaded in editor:', imgData.url)
-        canvas.width = img.width
-        canvas.height = img.height
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(img, 0, 0)
-        
-        meme.lines.forEach((line, idx) => {
-            const yPos = line.y
-            console.log(`Line ${idx} rendering at yPos: ${yPos}`)
-            
-            ctx.font = `${line.size}px ${line.fontFamily}`
-            ctx.fillStyle = line.color
-            ctx.strokeStyle = 'white'
-            ctx.lineWidth = 2
-            ctx.textAlign = line.align
-            
-            const textWidth = ctx.measureText(line.txt).width
-            const textHeight = line.size
-            const padding = 10
-            let textX
-            let boxX
-            if (line.align === 'left') {
-                textX = 10
-                boxX = textX - padding
-            } else if (line.align === 'right') {
-                textX = canvas.width - 10
-                boxX = textX - textWidth - padding
-            } else { 
-                textX = canvas.width / 2
-                boxX = textX - textWidth / 2 - padding
-            }
-            const boxY = yPos - textHeight - padding / 2
-            const boxWidth = textWidth + padding * 2
-            const boxHeight = textHeight + padding
-            
-            setLineBox(idx, boxX, boxY, boxWidth, boxHeight)
-            
-            ctx.lineWidth = 3
-            ctx.strokeStyle = 'black'
-            ctx.strokeText(line.txt, textX, yPos)
-            ctx.fillText(line.txt, textX, yPos)
-            
-            if (idx === meme.selectedLineIdx) {
-                ctx.strokeStyle = 'white'
-                ctx.lineWidth = 2
-                ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
-            }
-        })
+    const img = getImageById(meme.selectedImgId)
+    currentImageObj = new Image()
+    currentImageObj.src = img.url
+    currentImageObj.onload = () => {
+        renderMeme() 
     }
 }
 
-function initFontFamilyControl() {
-    const fontFamilySelect = document.getElementById('font-family')
-    fontFamilySelect.addEventListener('change', () => {
-        setFontFamily(fontFamilySelect.value, getMeme().selectedLineIdx)
+function initEditorControls() {
+    const textInput = document.getElementById('meme-text-input')
+    textInput.addEventListener('input', () => {
+        const meme = getMeme()
+        setLineTxt(textInput.value, meme.selectedLineIdx)
         renderMeme()
     })
-}
 
-function initAlignmentControls() {
-    const alignLeftBtn = document.getElementById('align-left')
-    const alignCenterBtn = document.getElementById('align-center')
-    const alignRightBtn = document.getElementById('align-right')
-    
-    alignLeftBtn.addEventListener('click', () => {
-        const meme = getMeme()
-        const originalY = meme.lines[meme.selectedLineIdx].y
-        console.log(`Align left, original y: ${originalY}`)
-        setAlignment('left', meme.selectedLineIdx)
-        console.log(`After align left, y: ${meme.lines[meme.selectedLineIdx].y}`)
+    const moveUpBtn = document.getElementById('move-up-btn')
+    moveUpBtn.addEventListener('click', () => {
+        adjustLinePosition(getMeme().selectedLineIdx, -10, 500)
         renderMeme()
     })
-    alignCenterBtn.addEventListener('click', () => {
-        const meme = getMeme()
-        const originalY = meme.lines[meme.selectedLineIdx].y
-        console.log(`Align center, original y: ${originalY}`)
-        setAlignment('center', meme.selectedLineIdx)
-        console.log(`After align center, y: ${meme.lines[meme.selectedLineIdx].y}`)
-        renderMeme()
-    })
-    alignRightBtn.addEventListener('click', () => {
-        const meme = getMeme()
-        const originalY = meme.lines[meme.selectedLineIdx].y
-        console.log(`Align right, original y: ${originalY}`)
-        setAlignment('right', meme.selectedLineIdx)
-        console.log(`After align right, y: ${meme.lines[meme.selectedLineIdx].y}`)
-        renderMeme()
-    })
-}
 
-function initDeleteLineBtn() {
+    const moveDownBtn = document.getElementById('move-down-btn')
+    moveDownBtn.addEventListener('click', () => {
+        adjustLinePosition(getMeme().selectedLineIdx, 10, 500)
+        renderMeme()
+    })
+
+    const switchLineBtn = document.getElementById('switch-line-btn')
+    switchLineBtn.addEventListener('click', () => {
+        switchLine()
+        const meme = getMeme()
+        selectedLineIdx = meme.selectedLineIdx
+        document.getElementById('meme-text-input').value = meme.lines[meme.selectedLineIdx].txt
+        renderMeme()
+    })
+
+    const addLineBtn = document.getElementById('add-line-btn')
+    addLineBtn.addEventListener('click', () => {
+        const newLineIdx = addLine()
+        setSelectedLine(newLineIdx)
+        selectedLineIdx = newLineIdx
+        document.getElementById('meme-text-input').value = ''
+        renderMeme()
+    })
+
     const deleteLineBtn = document.getElementById('delete-line-btn')
     deleteLineBtn.addEventListener('click', () => {
         const meme = getMeme()
         if (meme.lines.length > 1) {
             meme.lines.splice(meme.selectedLineIdx, 1)
-            meme.selectedLineIdx = Math.min(meme.selectedLineIdx, meme.lines.length - 1)
-            updateSelectedLineUI()
-            updateFontSizeDisplay()
-            updateFontColorDisplay()
+            selectedLineIdx = Math.max(0, meme.selectedLineIdx - 1)
+            setSelectedLine(selectedLineIdx)
+            document.getElementById('meme-text-input').value = meme.lines[selectedLineIdx].txt
             renderMeme()
         }
     })
-}
 
-function initEmojiControls() {
-    const emojis = document.querySelectorAll('.emoji-controls button')
-    emojis.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const emoji = btn.textContent
-            setLineTxt(getMeme().lines[getMeme().selectedLineIdx].txt + emoji, getMeme().selectedLineIdx)
-            renderMeme()
-        })
+    const fontFamily = document.getElementById('font-family')
+    fontFamily.addEventListener('change', (e) => {
+        const meme = getMeme()
+        setFontFamily(e.target.value, meme.selectedLineIdx)
+        renderMeme()
     })
-}
 
-function initShareBtn() {
+    const fontColor = document.getElementById('font-color')
+    fontColor.addEventListener('input', (e) => {
+        const meme = getMeme()
+        setColor(e.target.value, meme.selectedLineIdx)
+        renderMeme()
+    })
+
+    const increaseFont = document.getElementById('increase-font')
+    increaseFont.addEventListener('click', () => {
+        const meme = getMeme()
+        const newSize = meme.lines[meme.selectedLineIdx].size + 5
+        setFontSize(newSize, meme.selectedLineIdx)
+        renderMeme()
+    })
+
+    const decreaseFont = document.getElementById('decrease-font')
+    decreaseFont.addEventListener('click', () => {
+        const meme = getMeme()
+        const newSize = Math.max(10, meme.lines[meme.selectedLineIdx].size - 5)
+        setFontSize(newSize, meme.selectedLineIdx)
+        renderMeme()
+    })
+
+    const alignLeft = document.getElementById('align-left')
+    alignLeft.addEventListener('click', () => {
+        const meme = getMeme()
+        setAlignment('left', meme.selectedLineIdx)
+        renderMeme()
+    })
+
+    const alignCenter = document.getElementById('align-center')
+    alignCenter.addEventListener('click', () => {
+        const meme = getMeme()
+        setAlignment('center', meme.selectedLineIdx)
+        renderMeme()
+    })
+
+    const alignRight = document.getElementById('align-right')
+    alignRight.addEventListener('click', () => {
+        const meme = getMeme()
+        setAlignment('right', meme.selectedLineIdx)
+        renderMeme()
+    })
+
+    const emoji1 = document.getElementById('emoji1')
+    emoji1.addEventListener('click', () => {
+        const meme = getMeme()
+        const currentText = meme.lines[meme.selectedLineIdx].txt
+        setLineTxt(currentText + '😄', meme.selectedLineIdx)
+        document.getElementById('meme-text-input').value = meme.lines[meme.selectedLineIdx].txt
+        renderMeme()
+    })
+
+    const emoji2 = document.getElementById('emoji2')
+    emoji2.addEventListener('click', () => {
+        const meme = getMeme()
+        const currentText = meme.lines[meme.selectedLineIdx].txt
+        setLineTxt(currentText + '😂', meme.selectedLineIdx)
+        document.getElementById('meme-text-input').value = meme.lines[meme.selectedLineIdx].txt
+        renderMeme()
+    })
+
+    const emoji3 = document.getElementById('emoji3')
+    emoji3.addEventListener('click', () => {
+        const meme = getMeme()
+        const currentText = meme.lines[meme.selectedLineIdx].txt
+        setLineTxt(currentText + '😢', meme.selectedLineIdx)
+        document.getElementById('meme-text-input').value = meme.lines[meme.selectedLineIdx].txt
+        renderMeme()
+    })
+
+    const emoji4 = document.getElementById('emoji4')
+    emoji4.addEventListener('click', () => {
+        const meme = getMeme()
+        const currentText = meme.lines[meme.selectedLineIdx].txt
+        setLineTxt(currentText + '😡', meme.selectedLineIdx)
+        document.getElementById('meme-text-input').value = meme.lines[meme.selectedLineIdx].txt
+        renderMeme()
+    })
+
     const shareBtn = document.getElementById('share-btn')
     shareBtn.addEventListener('click', () => {
-        alert('Share functionality to be implemented')
+        alert('Share functionality coming soon!')
+    })
+
+    const downloadLink = document.getElementById('download-link')
+    downloadLink.addEventListener('click', (e) => {
+        e.preventDefault()
+        const canvas = document.getElementById('meme-canvas')
+        const link = document.createElement('a')
+        link.download = 'meme.png'
+        link.href = canvas.toDataURL('image/png')
+        link.click()
     })
 }
 
-function initPositionControls() {
-    const moveUpBtn = document.getElementById('move-up-btn')
-    const moveDownBtn = document.getElementById('move-down-btn')
+function initCanvasDragAndDrop() {
     const canvas = document.getElementById('meme-canvas')
     
-    moveUpBtn.addEventListener('click', () => {
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+
         const meme = getMeme()
-        console.log(`Move Up clicked, current y: ${meme.lines[meme.selectedLineIdx].y}`)
-        adjustLinePosition(meme.selectedLineIdx, -10, canvas.height)
-        console.log(`After moving up, new y: ${meme.lines[meme.selectedLineIdx].y}`)
+        draggedLineIdx = meme.lines.findIndex(line => {
+            const left = line.boxX
+            const right = line.boxX + line.boxWidth
+            const top = line.boxY
+            const bottom = line.boxY + line.boxHeight
+            return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom
+        })
+
+        if (draggedLineIdx !== -1) {
+            isDragging = true
+            const line = meme.lines[draggedLineIdx]
+            dragOffsetX = mouseX - line.x
+            dragOffsetY = mouseY - line.y
+            selectedLineIdx = draggedLineIdx
+            setSelectedLine(draggedLineIdx)
+            document.getElementById('meme-text-input').value = line.txt
+            renderMeme()
+        }
+    })
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging) return
+
+        const rect = canvas.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+
+        const meme = getMeme()
+        const line = meme.lines[draggedLineIdx]
+        
+        line.x = Math.max(0, Math.min(mouseX - dragOffsetX, canvas.width))
+        line.y = Math.max(0, Math.min(mouseY - dragOffsetY, canvas.height))
+
         renderMeme()
     })
-    
-    moveDownBtn.addEventListener('click', () => {
-        const meme = getMeme()
-        console.log(`Move Down clicked, current y: ${meme.lines[meme.selectedLineIdx].y}`)
-        adjustLinePosition(meme.selectedLineIdx, 50, canvas.height)
-        console.log(`After moving down, new y: ${meme.lines[meme.selectedLineIdx].y}`)
+
+    canvas.addEventListener('mouseup', () => {
+        isDragging = false
+        draggedLineIdx = -1
         renderMeme()
+    })
+
+    canvas.addEventListener('mouseleave', () => {
+        isDragging = false
+        draggedLineIdx = -1
+        renderMeme()
+    })
+}
+
+function renderMeme() {
+    const canvas = document.getElementById('meme-canvas')
+    const ctx = canvas.getContext('2d')
+    const meme = getMeme()
+    
+    canvas.width = 500
+    canvas.height = 500
+
+    if (currentImageObj && currentImageObj.complete) {
+        ctx.drawImage(currentImageObj, 0, 0, canvas.width, canvas.height)
+    }
+
+    meme.lines.forEach((line, idx) => {
+        ctx.font = `${line.size}px ${line.fontFamily}`
+        ctx.fillStyle = line.color
+        ctx.textAlign = line.align
+        ctx.textBaseline = 'middle'
+
+        ctx.fillText(line.txt, line.x, line.y)
+
+        const metrics = ctx.measureText(line.txt)
+        const boxWidth = metrics.width
+        const ascent = metrics.actualBoundingBoxAscent || line.size 
+        const descent = metrics.actualBoundingBoxDescent || 0
+        const boxHeight = ascent + descent
+        var boxX = line.x
+        if (line.align === 'center') {
+            boxX -= boxWidth / 2
+        } else if (line.align === 'right') {
+            boxX -= boxWidth
+        }
+        const boxY = line.y - ascent 
+        setLineBox(idx, boxX, boxY, boxWidth, boxHeight)
+
+        if (idx === selectedLineIdx) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
+            ctx.lineWidth = 2
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
+        }
     })
 }
