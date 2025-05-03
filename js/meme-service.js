@@ -103,10 +103,25 @@ function setLineBox(idx, boxX, boxY, boxWidth, boxHeight) {
 
 function adjustLinePosition(lineIdx, deltaY, canvasHeight) {
     const line = gMeme.lines[lineIdx]
-    console.log(`Adjusting position for line ${lineIdx}, current y: ${line.y}, deltaY: ${deltaY}`)
     const newY = line.y + deltaY
     const minY = 0 + line.boxHeight / 2
     const maxY = canvasHeight - line.boxHeight / 2
     line.y = Math.max(minY, Math.min(newY, maxY))
-    console.log(`New y position: ${line.y}`)
+}
+
+function saveMeme() {
+    const meme = getMeme()
+    const savedMemes = storageService.loadFromStorage('savedMemes') || []
+    savedMemes.push({ ...meme })
+    storageService.saveToStorage('savedMemes', savedMemes)
+}
+
+function loadSavedMemes() {
+    return storageService.loadFromStorage('savedMemes') || []
+}
+
+function loadMeme(memeData) {
+    gMeme.selectedImgId = memeData.selectedImgId
+    gMeme.lines = memeData.lines.map(line => ({ ...line }))
+    gMeme.selectedLineIdx = 0
 }

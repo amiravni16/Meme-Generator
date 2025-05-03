@@ -28,6 +28,11 @@
             <div id="gallery-content" class="gallery-grid">
             </div>
         </section>
+        <section id="saved-memes" style="display: none;">
+            <h2>Saved Memes</h2>
+            <div id="saved-memes-content" class="gallery-grid">
+            </div>
+        </section>
         <section id="editor" style="display: none;">
             <h2>Meme Editor</h2>
             <div id="editor-content" class="editor-layout">
@@ -74,6 +79,7 @@
                     </div>
                     <div class="control-row">
                         <div class="action-controls">
+                            <button id="save-btn">Save</button>
                             <button id="share-btn">Share</button>
                             <a href="#" id="download-link">Download</a>
                         </div>
@@ -82,6 +88,7 @@
             </div>
         </section>
     </main>
+    <script src="js/storage.service.js"></script>
     <script src="js/meme-service.js"></script>
     <script src="js/gallery-controller.js"></script>
     <script src="js/meme-controller.js"></script>

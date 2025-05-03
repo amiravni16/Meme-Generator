@@ -3,8 +3,10 @@
 function initGalleryController() {
     console.log('initGalleryController called')
     renderGallery()
+    renderSavedMemes()
     initSearchBar()
     initFlexibleBtn()
+    initSaveBtn()
 }
 
 function renderGallery() {
@@ -17,6 +19,87 @@ function renderGallery() {
         </div>
     `)
     galleryContent.innerHTML = strHTMLs.join('')
+}
+
+function generateMemeThumbnail(meme) {
+    // Create a temporary canvas with higher resolution for sharper text
+    const highResSize = 400 // Higher resolution (2x the display size)
+    const displaySize = 200 // Actual display size
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    
+    // Set canvas to high resolution
+    canvas.width = highResSize
+    canvas.height = highResSize
+
+    // Load the image
+    const img = getImageById(meme.selectedImgId)
+    const imageObj = new Image()
+    imageObj.src = img.url
+
+    return new Promise((resolve) => {
+        imageObj.onload = () => {
+            // Draw the image at high resolution, scaled to fit
+            ctx.drawImage(imageObj, 0, 0, highResSize, highResSize)
+
+            // Draw each text line at high resolution
+            const scale = highResSize / 500 // Scale factor based on assumed editor canvas size
+            meme.lines.forEach(line => {
+                const scaledSize = line.size * scale // Scale the font size
+                ctx.font = `${Math.round(scaledSize)}px ${line.fontFamily}` // Round for crisp rendering
+                ctx.fillStyle = line.color
+                ctx.textAlign = line.align
+                ctx.textBaseline = 'middle' // Improve vertical alignment
+
+                // Scale the text position
+                const scaleX = highResSize / 500
+                const scaleY = highResSize / 500
+                const x = line.x * scaleX
+                const y = line.y * scaleY
+
+                ctx.fillText(line.txt, x, y)
+            })
+
+            // Create a second canvas for the final display size
+            const displayCanvas = document.createElement('canvas')
+            displayCanvas.width = displaySize
+            displayCanvas.height = displaySize
+            const displayCtx = displayCanvas.getContext('2d')
+
+            // Disable image smoothing if supported (reduces blur when scaling down)
+            displayCtx.imageSmoothingEnabled = false
+            if (displayCtx.imageSmoothingQuality) {
+                displayCtx.imageSmoothingQuality = 'high'
+            }
+
+            // Draw the high-res canvas onto the display canvas, scaled down
+            displayCtx.drawImage(canvas, 0, 0, displaySize, displaySize)
+
+            // Convert to data URL
+            const dataUrl = displayCanvas.toDataURL('image/png')
+            resolve(dataUrl)
+        }
+    })
+}
+
+async function renderSavedMemes() {
+    console.log('renderSavedMemes called')
+    const savedMemes = loadSavedMemes()
+    const savedMemesContent = document.getElementById('saved-memes-content')
+    const strHTMLs = []
+
+    for (let idx = 0; idx < savedMemes.length; idx++) {
+        const meme = savedMemes[idx]
+        const thumbnailUrl = await generateMemeThumbnail(meme)
+        strHTMLs.push(`
+            <div class="gallery-item">
+                <img src="${thumbnailUrl}" alt="Saved meme ${idx}" onclick="onSavedMemeSelect(${idx})">
+            </div>
+        `)
+    }
+
+    savedMemesContent.innerHTML = strHTMLs.join('')
+    document.getElementById('saved-memes').style.display = savedMemes.length > 0 ? 'block' : 'none'
 }
 
 function initSearchBar() {
@@ -42,8 +125,17 @@ function initFlexibleBtn() {
     flexibleBtn.addEventListener('click', () => {
         generateRandomMeme()
         document.getElementById('gallery').style.display = 'none'
+        document.getElementById('saved-memes').style.display = 'none'
         document.getElementById('editor').style.display = 'block'
         renderMeme()
+    })
+}
+
+function initSaveBtn() {
+    const saveBtn = document.getElementById('save-btn')
+    saveBtn.addEventListener('click', () => {
+        saveMeme()
+        renderSavedMemes()
     })
 }
 
@@ -83,6 +175,17 @@ function generateRandomMeme() {
 function onImageSelect(imgId) {
     setImg(imgId)
     document.getElementById('gallery').style.display = 'none'
+    document.getElementById('saved-memes').style.display = 'none'
+    document.getElementById('editor').style.display = 'block'
+    renderMeme()
+}
+
+function onSavedMemeSelect(memeIdx) {
+    const savedMemes = loadSavedMemes()
+    const memeData = savedMemes[memeIdx]
+    loadMeme(memeData)
+    document.getElementById('gallery').style.display = 'none'
+    document.getElementById('saved-memes').style.display = 'none'
     document.getElementById('editor').style.display = 'block'
     renderMeme()
 }
