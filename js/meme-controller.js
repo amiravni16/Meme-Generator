@@ -6,6 +6,8 @@ var dragOffsetX = 0
 var dragOffsetY = 0
 var selectedLineIdx = 0
 var currentImageObj = null 
+var gElCanvas = document.getElementById('meme-canvas')
+var gCtx = gElCanvas.getContext('2d')
 
 function initMemeController() {
     console.log('initMemeController called')
@@ -162,9 +164,7 @@ function initEditorControls() {
     })
 
     const shareBtn = document.getElementById('share-btn')
-    shareBtn.addEventListener('click', () => {
-        alert('Share functionality coming soon!')
-    })
+    shareBtn.addEventListener('click', onShareImg)
 
     const downloadLink = document.getElementById('download-link')
     downloadLink.addEventListener('click', (e) => {
@@ -216,8 +216,8 @@ function initCanvasDragAndDrop() {
         const meme = getMeme()
         const line = meme.lines[draggedLineIdx]
         
-        line.x = Math.max(0, Math.min(mouseX - dragOffsetX, canvas.width))
-        line.y = Math.max(0, Math.min(mouseY - dragOffsetY, canvas.height))
+        line.x = Math.max(0, Math.min(mouseX - dragOffsetX, gElCanvas.width))
+        line.y = Math.max(0, Math.min(mouseY - dragOffsetY, gElCanvas.height))
 
         renderMeme()
     })
@@ -236,29 +236,27 @@ function initCanvasDragAndDrop() {
 }
 
 function renderMeme() {
-    const canvas = document.getElementById('meme-canvas')
-    const ctx = canvas.getContext('2d')
-    const meme = getMeme()
-    
-    canvas.width = 500
-    canvas.height = 500
+    gElCanvas.width = 500
+    gElCanvas.height = 500
 
+   
     if (currentImageObj && currentImageObj.complete) {
-        ctx.drawImage(currentImageObj, 0, 0, canvas.width, canvas.height)
+        gCtx.drawImage(currentImageObj, 0, 0, gElCanvas.width, gElCanvas.height)
     }
 
+    const meme = getMeme()
     meme.lines.forEach((line, idx) => {
-        ctx.font = `${line.size}px ${line.fontFamily}`
-        ctx.fillStyle = line.color
-        ctx.textAlign = line.align
-        ctx.textBaseline = 'middle'
+        gCtx.font = `${line.size}px ${line.fontFamily}`
+        gCtx.fillStyle = line.color
+        gCtx.textAlign = line.align
+        gCtx.textBaseline = 'middle'
 
-        ctx.fillText(line.txt, line.x, line.y)
+        gCtx.fillText(line.txt, line.x, line.y)
 
-        const metrics = ctx.measureText(line.txt)
-        const boxWidth = metrics.width
-        const ascent = metrics.actualBoundingBoxAscent || line.size 
+        const metrics = gCtx.measureText(line.txt)
+        const ascent = metrics.actualBoundingBoxAscent || line.size
         const descent = metrics.actualBoundingBoxDescent || 0
+        const boxWidth = metrics.width
         const boxHeight = ascent + descent
         var boxX = line.x
         if (line.align === 'center') {
@@ -266,13 +264,44 @@ function renderMeme() {
         } else if (line.align === 'right') {
             boxX -= boxWidth
         }
-        const boxY = line.y - ascent 
+        const boxY = line.y - ascent
         setLineBox(idx, boxX, boxY, boxWidth, boxHeight)
 
         if (idx === selectedLineIdx) {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
-            ctx.lineWidth = 2
-            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
+            gCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
+            gCtx.lineWidth = 2
+            gCtx.strokeRect(boxX, boxY, boxWidth, boxHeight)
         }
     })
+}
+
+function onShareImg(ev) {
+    ev.preventDefault()
+    const canvasData = gElCanvas.toDataURL('image/jpeg')
+
+    function onSuccess(uploadedImgUrl) {
+        const encodedUploadedImgUrl = encodeURIComponent(uploadedImgUrl)
+        console.log('encodedUploadedImgUrl:', encodedUploadedImgUrl)
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUploadedImgUrl}&t=${encodedUploadedImgUrl}`)
+    }
+    uploadImg(canvasData, onSuccess)
+}
+
+async function uploadImg(imgData, onSuccess) {
+    const CLOUD_NAME = 'webify'
+    const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`
+    const formData = new FormData()
+    formData.append('file', imgData)
+    formData.append('upload_preset', 'webify')
+    try {
+        const res = await fetch(UPLOAD_URL, {
+            method: 'POST',
+            body: formData
+        })
+        const data = await res.json()
+        console.log('Cloudinary response:', data)
+        onSuccess(data.secure_url)
+    } catch (err) {
+        console.log(err)
+    }
 }
