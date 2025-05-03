@@ -5,7 +5,7 @@ var draggedLineIdx = -1
 var dragOffsetX = 0
 var dragOffsetY = 0
 var selectedLineIdx = 0
-var currentImageObj = null 
+var currentImageObj = null
 var gElCanvas = document.getElementById('meme-canvas')
 var gCtx = gElCanvas.getContext('2d')
 
@@ -14,15 +14,22 @@ function initMemeController() {
     initEditorControls()
     initCanvasDragAndDrop()
     preloadImage() 
+
+    window.addEventListener('imageSelected', () => {
+        preloadImage()
+        renderMeme()
+    })
 }
 
 function preloadImage() {
     const meme = getMeme()
     const img = getImageById(meme.selectedImgId)
-    currentImageObj = new Image()
-    currentImageObj.src = img.url
-    currentImageObj.onload = () => {
-        renderMeme() 
+    if (img && img.url) {
+        currentImageObj = new Image()
+        currentImageObj.src = img.url
+        currentImageObj.onload = () => {
+            renderMeme()
+        }
     }
 }
 
@@ -239,13 +246,12 @@ function renderMeme() {
     gElCanvas.width = 500
     gElCanvas.height = 500
 
-   
     if (currentImageObj && currentImageObj.complete) {
         gCtx.drawImage(currentImageObj, 0, 0, gElCanvas.width, gElCanvas.height)
     }
 
     const meme = getMeme()
-    const padding = 5 
+    const padding = 5
     meme.lines.forEach((line, idx) => {
         gCtx.font = `${line.size}px ${line.fontFamily}`
         gCtx.fillStyle = line.color

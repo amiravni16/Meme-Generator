@@ -10,6 +10,49 @@ function initGalleryController() {
     initSearchBar()
     initFlexibleBtn()
     initSaveBtn()
+    initImageUpload() 
+}
+
+function initImageUpload() {
+    const uploadInput = document.getElementById('upload-image-btn')
+    uploadInput.addEventListener('change', onImgInput)
+}
+
+function onImgInput(ev) {
+    loadImageFromInput(ev, onImageUploaded)
+}
+
+function loadImageFromInput(ev, onImageReady) {
+    const reader = new FileReader()
+
+    reader.onload = function (event) {
+        const img = new Image()
+        img.onload = () => {
+            onImageReady(img)
+        }
+        img.src = event.target.result
+    }
+    reader.readAsDataURL(ev.target.files[0])
+}
+
+function onImageUploaded(img) {
+    const images = getImages()
+    const newImageId = images.length + 1 
+    const newImage = {
+        id: newImageId,
+        url: img.src,
+        keywords: ['custom'] 
+    }
+    images.push(newImage)
+
+    
+    setImg(newImageId)
+   
+    window.dispatchEvent(new Event('imageSelected'))
+    document.getElementById('gallery').style.display = 'none'
+    document.getElementById('saved-memes').style.display = 'none'
+    document.getElementById('editor').style.display = 'block'
+    renderMeme()
 }
 
 function populateKeywordList() {
@@ -181,6 +224,7 @@ function generateRandomMeme() {
 
 function onImageSelect(imgId) {
     setImg(imgId)
+    window.dispatchEvent(new Event('imageSelected'))
     document.getElementById('gallery').style.display = 'none'
     document.getElementById('saved-memes').style.display = 'none'
     document.getElementById('editor').style.display = 'block'
@@ -191,6 +235,7 @@ function onSavedMemeSelect(memeIdx) {
     const savedMemes = loadSavedMemes()
     const memeData = savedMemes[memeIdx]
     loadMeme(memeData)
+    window.dispatchEvent(new Event('imageSelected'))
     document.getElementById('gallery').style.display = 'none'
     document.getElementById('saved-memes').style.display = 'none'
     document.getElementById('editor').style.display = 'block'
