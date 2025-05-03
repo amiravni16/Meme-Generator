@@ -2,11 +2,19 @@
 
 function initGalleryController() {
     console.log('initGalleryController called')
+    populateKeywordList()
     renderGallery()
     renderSavedMemes()
     initSearchBar()
     initFlexibleBtn()
     initSaveBtn()
+}
+
+function populateKeywordList() {
+    const images = getImages()
+    const keywords = [...new Set(images.flatMap(img => img.keywords))] // Unique keywords
+    const datalist = document.getElementById('keyword-list')
+    datalist.innerHTML = keywords.map(keyword => `<option value="${keyword}">`).join('')
 }
 
 function renderGallery() {
@@ -22,36 +30,30 @@ function renderGallery() {
 }
 
 function generateMemeThumbnail(meme) {
-    // Create a temporary canvas with higher resolution for sharper text
-    const highResSize = 400 // Higher resolution (2x the display size)
-    const displaySize = 200 // Actual display size
+    const highResSize = 400
+    const displaySize = 200
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     
-    // Set canvas to high resolution
     canvas.width = highResSize
     canvas.height = highResSize
 
-    // Load the image
     const img = getImageById(meme.selectedImgId)
     const imageObj = new Image()
     imageObj.src = img.url
 
     return new Promise((resolve) => {
         imageObj.onload = () => {
-            // Draw the image at high resolution, scaled to fit
             ctx.drawImage(imageObj, 0, 0, highResSize, highResSize)
 
-            // Draw each text line at high resolution
-            const scale = highResSize / 500 // Scale factor based on assumed editor canvas size
+            const scale = highResSize / 500
             meme.lines.forEach(line => {
-                const scaledSize = line.size * scale // Scale the font size
-                ctx.font = `${Math.round(scaledSize)}px ${line.fontFamily}` // Round for crisp rendering
+                const scaledSize = line.size * scale
+                ctx.font = `${Math.round(scaledSize)}px ${line.fontFamily}`
                 ctx.fillStyle = line.color
                 ctx.textAlign = line.align
-                ctx.textBaseline = 'middle' // Improve vertical alignment
+                ctx.textBaseline = 'middle'
 
-                // Scale the text position
                 const scaleX = highResSize / 500
                 const scaleY = highResSize / 500
                 const x = line.x * scaleX
@@ -60,22 +62,18 @@ function generateMemeThumbnail(meme) {
                 ctx.fillText(line.txt, x, y)
             })
 
-            // Create a second canvas for the final display size
             const displayCanvas = document.createElement('canvas')
             displayCanvas.width = displaySize
             displayCanvas.height = displaySize
             const displayCtx = displayCanvas.getContext('2d')
 
-            // Disable image smoothing if supported (reduces blur when scaling down)
             displayCtx.imageSmoothingEnabled = false
             if (displayCtx.imageSmoothingQuality) {
                 displayCtx.imageSmoothingQuality = 'high'
             }
 
-            // Draw the high-res canvas onto the display canvas, scaled down
             displayCtx.drawImage(canvas, 0, 0, displaySize, displaySize)
 
-            // Convert to data URL
             const dataUrl = displayCanvas.toDataURL('image/png')
             resolve(dataUrl)
         }
@@ -103,13 +101,15 @@ async function renderSavedMemes() {
 }
 
 function initSearchBar() {
-    const searchInput = document.querySelector('.search-bar input')
+    const searchInput = document.getElementById('search-input')
+    const clearFilterBtn = document.getElementById('clear-filter-btn')
+
     searchInput.addEventListener('input', () => {
         const keyword = searchInput.value.toLowerCase()
         const images = getImages()
-        const filteredImages = images.filter(img => 
+        const filteredImages = keyword ? images.filter(img => 
             img.keywords.some(kw => kw.toLowerCase().includes(keyword))
-        )
+        ) : images
         const galleryContent = document.getElementById('gallery-content')
         const strHTMLs = filteredImages.map(img => `
             <div class="gallery-item">
@@ -117,6 +117,11 @@ function initSearchBar() {
             </div>
         `)
         galleryContent.innerHTML = strHTMLs.join('')
+    })
+
+    clearFilterBtn.addEventListener('click', () => {
+        searchInput.value = ''
+        renderGallery() // Reset to show all images
     })
 }
 

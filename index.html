@@ -22,7 +22,10 @@
         <section id="gallery">
             <h2>Image Gallery</h2>
             <div class="search-bar">
-                <input type="text" placeholder="Search...">
+                <input type="text" id="search-input" list="keyword-list" placeholder="Filter by keyword...">
+                <datalist id="keyword-list">
+                </datalist>
+                <button id="clear-filter-btn">Clear</button>
                 <button id="flexible-btn">I’m flexible</button>
             </div>
             <div id="gallery-content" class="gallery-grid">
