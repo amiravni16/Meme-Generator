@@ -29,10 +29,12 @@
                 <input type="text" id="search-input" list="keyword-list" placeholder="Filter by keyword...">
                 <datalist id="keyword-list">
                 </datalist>
-                <button id="clear-filter-btn">Clear</button>
-                <button id="flexible-btn">I'm flexible</button>
-                <label for="upload-image-btn" class="upload-btn">Upload Image</label>
-                <input type="file" id="upload-image-btn" accept="image/*" style="display: none;">
+                <button id="more-search-btn" type="button">More</button>
+                <div class="search-actions">
+                    <button id="flexible-btn">I'm flexible</button>
+                    <label for="upload-image-btn" class="upload-btn">Upload Image</label>
+                    <input type="file" id="upload-image-btn" accept="image/*" style="display: none;">
+                </div>
             </div>
             <div id="keyword-cloud" class="keyword-cloud"></div>
             <div id="gallery-content" class="gallery-grid">

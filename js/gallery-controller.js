@@ -198,17 +198,10 @@ function generateMemeThumbnail(meme) {
 
 function initSearchBar() {
     const searchInput = document.getElementById('search-input')
-    const clearFilterBtn = document.getElementById('clear-filter-btn')
 
     searchInput.addEventListener('input', () => {
         const keyword = searchInput.value.toLowerCase()
         filterGallery(keyword)
-    })
-
-    clearFilterBtn.addEventListener('click', () => {
-        searchInput.value = ''
-        renderGallery()
-        renderKeywordCloud()
     })
 }
 

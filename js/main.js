@@ -14,4 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedMemes) savedMemes.style.display = 'none';
         });
     }
+
+    const moreBtn = document.getElementById('more-search-btn');
+    const searchBar = document.querySelector('.search-bar');
+    if (moreBtn && searchBar) {
+        moreBtn.addEventListener('click', () => {
+            searchBar.classList.toggle('show-actions');
+        });
+    }
 })
