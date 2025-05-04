@@ -499,27 +499,40 @@ function onShareImg(ev) {
     ev.preventDefault()
     const canvasData = gElCanvas.toDataURL('image/jpeg')
 
-    function onSuccess(uploadedImgUrl) {
-        const encodedUploadedImgUrl = encodeURIComponent(uploadedImgUrl)
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUploadedImgUrl}&t=${encodedUploadedImgUrl}`)
+    if (navigator.share) {
+        gElCanvas.toBlob((blob) => {
+            const file = new File([blob], 'meme.jpg', { type: 'image/jpeg' })
+            navigator.share({
+                title: 'My Meme',
+                text: 'Check out this meme I created!',
+                files: [file]
+            })
+            .catch((error) => {
+                console.log('Error sharing:', error)
+                shareToFacebook(canvasData)
+            })
+        }, 'image/jpeg')
+    } else {
+        shareToFacebook(canvasData)
     }
-    uploadImg(canvasData, onSuccess)
 }
 
-async function uploadImg(imgData, onSuccess) {
+function shareToFacebook(canvasData) {
     const CLOUD_NAME = 'webify'
     const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`
     const formData = new FormData()
-    formData.append('file', imgData)
+    formData.append('file', canvasData)
     formData.append('upload_preset', 'webify')
-    try {
-        const res = await fetch(UPLOAD_URL, {
-            method: 'POST',
-            body: formData
-        })
-        const data = await res.json()
-        onSuccess(data.secure_url)
-    } catch (err) {
-        console.log(err)
-    }
+    
+    fetch(UPLOAD_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        const encodedUploadedImgUrl = encodeURIComponent(data.secure_url)
+        const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUploadedImgUrl}&t=${encodedUploadedImgUrl}`
+        window.open(facebookShareUrl, '_blank', 'width=600,height=400')
+    })
+    .catch(err => console.log('Error uploading to Cloudinary:', err))
 }
