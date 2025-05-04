@@ -1,24 +1,24 @@
 'use strict'
 
 const gImgs = [
-    { id: 1, url: 'img/1.jpg', keywords: ['funny', 'cat'] },
-    { id: 2, url: 'img/2.jpg', keywords: ['funny', 'cat'] },
-    { id: 3, url: 'img/3.jpg', keywords: ['funny', 'cat', 'baby'] },
-    { id: 4, url: 'img/4.jpg', keywords: ['funny', 'cat'] },
-    { id: 5, url: 'img/5.jpg', keywords: ['funny', 'baby'] },
+    { id: 1, url: 'img/1.jpg', keywords: ['funny', 'trump' , 'president', 'politics'] },
+    { id: 2, url: 'img/2.jpg', keywords: ['dog', 'cute', 'animal'] },
+    { id: 3, url: 'img/3.jpg', keywords: ['cute', 'dog', 'baby'] },
+    { id: 4, url: 'img/4.jpg', keywords: ['funny', 'cat', 'cute'] },
+    { id: 5, url: 'img/5.jpg', keywords: ['funny', 'baby', 'cute'] },
     { id: 6, url: 'img/6.jpg', keywords: ['funny', 'man'] },
     { id: 7, url: 'img/7.jpg', keywords: ['funny', 'baby'] },
     { id: 8, url: 'img/8.jpg', keywords: ['funny', 'man'] },
-    { id: 9, url: 'img/9.jpg', keywords: ['funny', 'baby'] },
-    { id: 10, url: 'img/10.jpg', keywords: ['funny', 'man'] },
-    { id: 11, url: 'img/11.jpg', keywords: ['funny', 'man'] },
+    { id: 9, url: 'img/9.jpg', keywords: ['funny', 'baby','evil'] },
+    { id: 10, url: 'img/10.jpg', keywords: ['funny', 'obama', 'president', 'politics'] },
+    { id: 11, url: 'img/11.jpg', keywords: ['funny', 'sports'] },
     { id: 12, url: 'img/12.jpg', keywords: ['funny', 'man'] },
-    { id: 13, url: 'img/13.jpg', keywords: ['funny', 'man'] },
-    { id: 14, url: 'img/14.jpg', keywords: ['funny', 'man'] },
-    { id: 15, url: 'img/15.jpg', keywords: ['funny', 'man'] },
-    { id: 16, url: 'img/16.jpg', keywords: ['funny', 'man'] },
-    { id: 17, url: 'img/17.jpg', keywords: ['funny', 'man'] },
-    { id: 18, url: 'img/18.jpg', keywords: ['funny', 'man'] }
+    { id: 13, url: 'img/13.jpg', keywords: ['movie', 'leo','winning'] },
+    { id: 14, url: 'img/14.jpg', keywords: ['movie', 'matrix','sad', 'serious'] },
+    { id: 15, url: 'img/15.jpg', keywords: ['movie', 'lord'] },
+    { id: 16, url: 'img/16.jpg', keywords: ['funny', 'star', 'movie'] },
+    { id: 17, url: 'img/17.jpg', keywords: ['politics', 'putin', 'president'] },
+    { id: 18, url: 'img/18.jpg', keywords: ['funny', 'movie', 'toy'] }
 ]
 
 const gMeme = {

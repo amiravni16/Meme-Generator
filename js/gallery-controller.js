@@ -45,7 +45,7 @@ function onImageUploaded(img) {
         keywords: ['custom']
     }
     images.push(newImage)
-    setImg(newImageId)
+    setSelectedImg(newImageId)
     window.dispatchEvent(new Event('imageSelected'))
     document.getElementById('gallery').style.display = 'none'
     document.getElementById('saved-memes').style.display = 'none'
@@ -61,23 +61,26 @@ function populateKeywordList() {
 }
 
 function renderKeywordCloud() {
-    const keywordPopularity = getKeywordPopularity()
-    const keywords = Object.keys(keywordPopularity)
-    const maxPopularity = Math.max(...Object.values(keywordPopularity))
-    const minPopularity = Math.min(...Object.values(keywordPopularity))
-    const maxFontSize = 40
-    const minFontSize = 16
+    const images = getImages();
+    const keywordsSet = new Set(images.flatMap(img => Array.isArray(img.keywords) ? img.keywords : []));
+    const keywords = Array.from(keywordsSet);
 
-    const keywordCloud = document.getElementById('keyword-cloud')
+    const keywordPopularity = getKeywordPopularity();
+    const maxPopularity = Math.max(...keywords.map(k => keywordPopularity[k] || 1));
+    const minPopularity = Math.min(...keywords.map(k => keywordPopularity[k] || 1));
+    const maxFontSize = 40;
+    const minFontSize = 16;
+
+    const keywordCloud = document.getElementById('keyword-cloud');
     const strHTMLs = keywords.map(keyword => {
-        const popularity = keywordPopularity[keyword]
-        let fontSize = minFontSize
+        const popularity = keywordPopularity[keyword] || 1;
+        let fontSize = minFontSize;
         if (maxPopularity !== minPopularity) {
-            fontSize = minFontSize + (popularity - minPopularity) * (maxFontSize - minFontSize) / (maxPopularity - minPopularity)
+            fontSize = minFontSize + (popularity - minPopularity) * (maxFontSize - minFontSize) / (maxPopularity - minPopularity);
         }
-        return `<span class="keyword" style="font-size: ${fontSize}px;" onclick="onKeywordClick('${keyword}')">${keyword}</span>`
-    })
-    keywordCloud.innerHTML = strHTMLs.join(' ')
+        return `<span class="keyword" style="font-size: ${fontSize}px;" onclick="onKeywordClick('${keyword}')">${keyword}</span>`;
+    });
+    keywordCloud.innerHTML = strHTMLs.join(' ');
 }
 
 function onKeywordClick(keyword) {
@@ -90,8 +93,14 @@ function onKeywordClick(keyword) {
 
 function filterGallery(keyword) {
     const images = getImages()
-    const filteredImages = keyword ? images.filter(img => 
-        img.keywords.some(kw => kw.toLowerCase().includes(keyword.toLowerCase()))
+    const trimmedKeyword = keyword.trim().toLowerCase()
+    const filteredImages = trimmedKeyword ? images.filter(img => 
+        Array.isArray(img.keywords) &&
+        img.keywords.some(kw => {
+            const match = kw.toLowerCase().includes(trimmedKeyword)
+            console.log('Checking keyword:', kw, 'against', trimmedKeyword, '=>', match)
+            return match
+        })
     ) : images
     const galleryContent = document.getElementById('gallery-content')
     const strHTMLs = filteredImages.map(img => `
@@ -100,7 +109,7 @@ function filterGallery(keyword) {
         </div>
     `)
     galleryContent.innerHTML = strHTMLs.join('')
-    console.log(`Filtered gallery: ${filteredImages.length} images rendered with keyword "${keyword || 'none'}"`)
+    console.log(`Filtered gallery: ${filteredImages.length} images rendered with keyword "${trimmedKeyword || 'none'}"`)
 }
 
 function renderGallery() {
@@ -237,19 +246,21 @@ function generateRandomMeme() {
     ]
     const randomText = randomTexts[Math.floor(Math.random() * randomTexts.length)]
     
-    setImg(randomImg.id)
+    setSelectedImg(randomImg.id)
     const meme = getMeme()
     meme.lines = [{
         txt: randomText,
-        size: 20,
-        color: '#ff0000',
+        size: 40,
+        color: 'white',
+        fontFamily: 'Impact',
         x: 250,
-        y: 50,
+        y: 250,
+        rotation: 0,
+        scale: 1,
         boxX: 0,
         boxY: 0,
         boxWidth: 0,
         boxHeight: 0,
-        fontFamily: 'Arial',
         align: 'center'
     }]
     meme.selectedLineIdx = 0
