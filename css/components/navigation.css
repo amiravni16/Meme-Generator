@@ -1,22 +1,39 @@
 header nav ul {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0;
+    margin: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    gap: 32px;
 }
 
 header nav ul li {
-    margin: 5px 0;
+    margin: 0;
 }
 
 header nav ul li a {
-    color: white;
+    color: #f8faff;
     text-decoration: none;
-    padding: 5px 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    background: none;
+    border: none;
+    transition: color 0.2s, border-bottom 0.2s;
+    padding: 4px 0;
 }
 
 header nav ul li a:hover {
-    text-decoration: underline;
+    color: #caf0f8;
+    border-bottom: 2px solid #caf0f8;
+}
+
+@media (max-width: 700px) {
+    header nav ul {
+        gap: 16px;
+    }
+    header nav ul li a {
+        font-size: 1rem;
+    }
 }
