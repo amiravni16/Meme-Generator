@@ -228,12 +228,12 @@ function generateRandomMeme() {
     const randomTexts = [
         'LOL THIS IS FUNNY',
         'WHEN LIFE GETS TOUGH',
-        'I CAN’T EVEN',
+        'I CAN\'T EVEN',
         'WHY IS THIS ME',
         'MEME LIFE',
         'TOO REAL',
         'SEND HELP',
-        'I’M DONE'
+        'I\'M DONE'
     ]
     const randomText = randomTexts[Math.floor(Math.random() * randomTexts.length)]
     
@@ -256,8 +256,9 @@ function generateRandomMeme() {
 }
 
 function onImageSelect(imgId) {
-    setImg(imgId)
-    window.dispatchEvent(new Event('imageSelected'))
+    setSelectedImg(imgId)
+    const event = new CustomEvent('imageSelected')
+    window.dispatchEvent(event)
     document.getElementById('gallery').style.display = 'none'
     document.getElementById('saved-memes').style.display = 'none'
     document.getElementById('editor').style.display = 'block'

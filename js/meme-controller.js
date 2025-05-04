@@ -9,9 +9,13 @@ var currentImageObj = null
 var gElCanvas = document.getElementById('meme-canvas')
 var gCtx = gElCanvas.getContext('2d')
 var gInlineInput = null
+var isResizing = false
+var isRotating = false
+var resizeHandleSize = 12
+var rotateHandleSize = 12
+var tooltipTimeout = null
 
 function initMemeController() {
-    console.log('initMemeController called')
     initEditorControls()
     initCanvasDragAndDrop()
     preloadImage()
@@ -201,8 +205,6 @@ function createInlineInput(lineIdx) {
     const line = meme.lines[lineIdx]
     const canvasRect = gElCanvas.getBoundingClientRect()
 
-    console.log('Creating inline input for line', lineIdx, 'at position:', { x: line.x, y: line.y, align: line.align })
-
     const input = document.createElement('input')
     input.type = 'text'
     input.className = 'inline-input'
@@ -217,7 +219,7 @@ function createInlineInput(lineIdx) {
     input.style.padding = '2px'
     input.style.textAlign = line.align
     input.style.boxSizing = 'border-box'
-    input.style.zIndex = '1000' 
+    input.style.zIndex = '1000'
 
     gCtx.font = `${line.size}px ${line.fontFamily}`
     const metrics = gCtx.measureText(line.txt || ' ')
@@ -246,7 +248,6 @@ function createInlineInput(lineIdx) {
     })
 
     input.addEventListener('blur', () => {
-        console.log('Inline input blurred, removing...')
         input.remove()
         gInlineInput = null
         renderMeme()
@@ -255,11 +256,21 @@ function createInlineInput(lineIdx) {
     document.body.appendChild(input)
     gInlineInput = input
     input.focus()
-    console.log('Inline input created and appended:', input)
 }
 
 function initCanvasDragAndDrop() {
     const canvas = document.getElementById('meme-canvas')
+    const tooltip = document.createElement('div')
+    tooltip.style.position = 'absolute'
+    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+    tooltip.style.color = 'white'
+    tooltip.style.padding = '5px 10px'
+    tooltip.style.borderRadius = '4px'
+    tooltip.style.fontSize = '12px'
+    tooltip.style.pointerEvents = 'none'
+    tooltip.style.display = 'none'
+    tooltip.style.zIndex = '1000'
+    document.body.appendChild(tooltip)
     
     canvas.addEventListener('mousedown', (e) => {
         const rect = canvas.getBoundingClientRect()
@@ -275,107 +286,211 @@ function initCanvasDragAndDrop() {
             return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom
         })
 
-        console.log('Mouse down at:', { mouseX, mouseY }, 'Clicked line:', clickedLineIdx)
-
         if (clickedLineIdx !== -1) {
-            draggedLineIdx = clickedLineIdx
-            const line = meme.lines[draggedLineIdx]
-            dragOffsetX = mouseX - line.x
-            dragOffsetY = mouseY - line.y
-            selectedLineIdx = clickedLineIdx
-            setSelectedLine(selectedLineIdx)
-            document.getElementById('meme-text-input').value = line.txt
+            const line = meme.lines[clickedLineIdx]
+            const centerX = line.x
+            const centerY = line.y
+            const angle = (line.rotation * Math.PI) / 180
+            const cos = Math.cos(angle)
+            const sin = Math.sin(angle)
+
+            const resizeHandleX = centerX + (line.boxWidth / 2) * cos - (line.boxHeight / 2) * sin
+            const resizeHandleY = centerY + (line.boxWidth / 2) * sin + (line.boxHeight / 2) * cos
+            const resizeHandleDist = Math.sqrt(
+                Math.pow(mouseX - resizeHandleX, 2) + Math.pow(mouseY - resizeHandleY, 2)
+            )
+
+            const rotateHandleX = centerX - (line.boxHeight / 2) * sin
+            const rotateHandleY = centerY + (line.boxHeight / 2) * cos
+            const rotateHandleDist = Math.sqrt(
+                Math.pow(mouseX - rotateHandleX, 2) + Math.pow(mouseY - rotateHandleY, 2)
+            )
+
+            if (resizeHandleDist <= resizeHandleSize) {
+                isResizing = true
+                draggedLineIdx = clickedLineIdx
+                dragOffsetX = mouseX - resizeHandleX
+                dragOffsetY = mouseY - resizeHandleY
+            } else if (rotateHandleDist <= rotateHandleSize) {
+                isRotating = true
+                draggedLineIdx = clickedLineIdx
+                dragOffsetX = mouseX - centerX
+                dragOffsetY = mouseY - centerY
+            } else {
+                isDragging = true
+                draggedLineIdx = clickedLineIdx
+                dragOffsetX = mouseX - line.x
+                dragOffsetY = mouseY - line.y
+                selectedLineIdx = clickedLineIdx
+                setSelectedLine(selectedLineIdx)
+                document.getElementById('meme-text-input').value = line.txt
+            }
+            renderMeme()
+        } else {
+            selectedLineIdx = -1
+            setSelectedLine(-1)
+            document.getElementById('meme-text-input').value = ''
             renderMeme()
         }
     })
 
-    canvas.addEventListener('click', (e) => {
-        const rect = canvas.getBoundingClientRect()
-        const mouseX = e.clientX - rect.left
-        const mouseY = e.clientY - rect.top
-
-        const meme = getMeme()
-        const clickedLineIdx = meme.lines.findIndex(line => {
-            const left = line.boxX
-            const right = line.boxX + line.boxWidth
-            const top = line.boxY
-            const bottom = line.boxY + line.boxHeight
-            return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom
-        })
-
-        console.log('Click at:', { mouseX, mouseY }, 'Clicked line:', clickedLineIdx)
-
-        if (clickedLineIdx !== -1 && !isDragging) {
-            createInlineInput(clickedLineIdx)
-        }
-    })
-
     canvas.addEventListener('mousemove', (e) => {
-        if (draggedLineIdx === -1) return
+        if (draggedLineIdx === -1) {
+            const rect = canvas.getBoundingClientRect()
+            const mouseX = e.clientX - rect.left
+            const mouseY = e.clientY - rect.top
 
-        isDragging = true
-        const rect = canvas.getBoundingClientRect()
-        const mouseX = e.clientX - rect.left
-        const mouseY = e.clientY - rect.top
+            const meme = getMeme()
+            const line = meme.lines[meme.selectedLineIdx]
+            if (line) {
+                const centerX = line.x
+                const centerY = line.y
+                const angle = (line.rotation * Math.PI) / 180
+                const cos = Math.cos(angle)
+                const sin = Math.sin(angle)
 
-        const meme = getMeme()
-        const line = meme.lines[draggedLineIdx]
-        
-        line.x = Math.max(0, Math.min(mouseX - dragOffsetX, gElCanvas.width))
-        line.y = Math.max(0, Math.min(mouseY - dragOffsetY, gElCanvas.height))
+                const resizeHandleX = centerX + (line.boxWidth / 2) * cos - (line.boxHeight / 2) * sin
+                const resizeHandleY = centerY + (line.boxWidth / 2) * sin + (line.boxHeight / 2) * cos
+                const resizeHandleDist = Math.sqrt(
+                    Math.pow(mouseX - resizeHandleX, 2) + Math.pow(mouseY - resizeHandleY, 2)
+                )
 
-        renderMeme()
+                const rotateHandleX = centerX - (line.boxHeight / 2) * sin
+                const rotateHandleY = centerY + (line.boxHeight / 2) * cos
+                const rotateHandleDist = Math.sqrt(
+                    Math.pow(mouseX - rotateHandleX, 2) + Math.pow(mouseY - rotateHandleY, 2)
+                )
+
+                if (resizeHandleDist <= resizeHandleSize) {
+                    tooltip.textContent = 'Drag to resize'
+                    tooltip.style.display = 'block'
+                    tooltip.style.left = e.clientX + 10 + 'px'
+                    tooltip.style.top = e.clientY + 10 + 'px'
+                    canvas.style.cursor = 'nwse-resize'
+                } else if (rotateHandleDist <= rotateHandleSize) {
+                    tooltip.textContent = 'Drag to rotate'
+                    tooltip.style.display = 'block'
+                    tooltip.style.left = e.clientX + 10 + 'px'
+                    tooltip.style.top = e.clientY + 10 + 'px'
+                    canvas.style.cursor = 'grab'
+                } else {
+                    tooltip.style.display = 'none'
+                    canvas.style.cursor = 'default'
+                }
+            }
+        } else {
+            const rect = canvas.getBoundingClientRect()
+            const mouseX = e.clientX - rect.left
+            const mouseY = e.clientY - rect.top
+
+            const meme = getMeme()
+            const line = meme.lines[draggedLineIdx]
+
+            if (isResizing) {
+                const centerX = line.x
+                const centerY = line.y
+                const angle = (line.rotation * Math.PI) / 180
+                const cos = Math.cos(angle)
+                const sin = Math.sin(angle)
+
+                const dx = mouseX - centerX
+                const dy = mouseY - centerY
+                const newWidth = Math.max(50, Math.abs(dx * cos + dy * sin) * 2)
+                const newHeight = Math.max(20, Math.abs(-dx * sin + dy * cos) * 2)
+
+                const scaleX = newWidth / line.boxWidth
+                const scaleY = newHeight / line.boxHeight
+                const newScale = Math.min(scaleX, scaleY)
+                setScale(newScale, draggedLineIdx)
+            } else if (isRotating) {
+                const centerX = line.x
+                const centerY = line.y
+                const dx = mouseX - centerX
+                const dy = mouseY - centerY
+                const newRotation = (Math.atan2(dy, dx) * 180) / Math.PI
+                setRotation(newRotation, draggedLineIdx)
+            } else if (isDragging) {
+                line.x = Math.max(0, Math.min(mouseX - dragOffsetX, gElCanvas.width))
+                line.y = Math.max(0, Math.min(mouseY - dragOffsetY, gElCanvas.height))
+            }
+
+            renderMeme()
+        }
     })
 
     canvas.addEventListener('mouseup', () => {
         isDragging = false
+        isResizing = false
+        isRotating = false
         draggedLineIdx = -1
+        tooltip.style.display = 'none'
+        canvas.style.cursor = 'default'
         renderMeme()
     })
 
     canvas.addEventListener('mouseleave', () => {
         isDragging = false
+        isResizing = false
+        isRotating = false
         draggedLineIdx = -1
+        tooltip.style.display = 'none'
+        canvas.style.cursor = 'default'
         renderMeme()
     })
 }
 
 function renderMeme() {
+    const meme = getMeme()
+    if (!currentImageObj) return
+
     gElCanvas.width = 500
     gElCanvas.height = 500
 
-    if (currentImageObj && currentImageObj.complete) {
-        gCtx.drawImage(currentImageObj, 0, 0, gElCanvas.width, gElCanvas.height)
-    }
+    gCtx.clearRect(0, 0, gElCanvas.width, gElCanvas.height)
+    gCtx.drawImage(currentImageObj, 0, 0, gElCanvas.width, gElCanvas.height)
 
-    const meme = getMeme()
-    const padding = 5
     meme.lines.forEach((line, idx) => {
-        gCtx.font = `${line.size}px ${line.fontFamily}`
+        gCtx.font = `${line.size * line.scale}px ${line.fontFamily}`
         gCtx.fillStyle = line.color
         gCtx.textAlign = line.align
         gCtx.textBaseline = 'middle'
 
-        gCtx.fillText(line.txt, line.x, line.y)
+        gCtx.save()
+        gCtx.translate(line.x, line.y)
+        gCtx.rotate((line.rotation * Math.PI) / 180)
+        gCtx.fillText(line.txt, 0, 0)
+        gCtx.restore()
 
-        const metrics = gCtx.measureText(line.txt || ' ')
-        const ascent = metrics.actualBoundingBoxAscent || line.size
-        const descent = metrics.actualBoundingBoxDescent || 0
-        const boxWidth = metrics.width + 2 * padding
-        const boxHeight = ascent + descent + 2 * padding
-        var boxX = line.x
-        if (line.align === 'center') {
-            boxX -= (metrics.width / 2 + padding)
-        } else if (line.align === 'right') {
-            boxX -= (metrics.width + padding)
-        }
-        const boxY = line.y - ascent - padding
-        setLineBox(idx, boxX, boxY, boxWidth, boxHeight)
+        if (idx === meme.selectedLineIdx) {
+            const textMetrics = gCtx.measureText(line.txt)
+            const padding = 5
+            const boxWidth = textMetrics.width + (padding * 2)
+            const boxHeight = (line.size * line.scale) + (padding * 2)
 
-        if (idx === selectedLineIdx && !gInlineInput) {
             gCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
             gCtx.lineWidth = 2
-            gCtx.strokeRect(boxX, boxY, boxWidth, boxHeight)
+
+            gCtx.save()
+            gCtx.translate(line.x, line.y)
+            gCtx.rotate((line.rotation * Math.PI) / 180)
+            gCtx.strokeRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight)
+
+            gCtx.fillStyle = 'white'
+            gCtx.beginPath()
+            gCtx.moveTo(boxWidth / 2 - resizeHandleSize, boxHeight / 2)
+            gCtx.lineTo(boxWidth / 2, boxHeight / 2 - resizeHandleSize)
+            gCtx.lineTo(boxWidth / 2, boxHeight / 2)
+            gCtx.closePath()
+            gCtx.fill()
+
+            gCtx.fillStyle = 'white'
+            gCtx.beginPath()
+            gCtx.arc(0, boxHeight / 2, rotateHandleSize / 2, 0, Math.PI * 2)
+            gCtx.fill()
+
+            gCtx.restore()
+
+            setLineBox(idx, line.x - boxWidth / 2, line.y - boxHeight / 2, boxWidth, boxHeight)
         }
     })
 }
@@ -386,7 +501,6 @@ function onShareImg(ev) {
 
     function onSuccess(uploadedImgUrl) {
         const encodedUploadedImgUrl = encodeURIComponent(uploadedImgUrl)
-        console.log('encodedUploadedImgUrl:', encodedUploadedImgUrl)
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUploadedImgUrl}&t=${encodedUploadedImgUrl}`)
     }
     uploadImg(canvasData, onSuccess)
@@ -404,7 +518,6 @@ async function uploadImg(imgData, onSuccess) {
             body: formData
         })
         const data = await res.json()
-        console.log('Cloudinary response:', data)
         onSuccess(data.secure_url)
     } catch (err) {
         console.log(err)

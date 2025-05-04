@@ -48,3 +48,28 @@
 #download-link:hover {
     background-color: var(--blue-hover);
 }
+
+.transform-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.transform-controls button {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.transform-controls button:hover {
+    background-color: #e0e0e0;
+}
+
+.transform-controls button:active {
+    background-color: #d0d0d0;
+}

@@ -1,42 +1,44 @@
 'use strict'
 
-var gImgs = [
-    { id: 1, url: 'img/1.jpg', keywords: ['funny', 'animal'] },
-    { id: 2, url: 'img/2.jpg', keywords: ['happy', 'nature'] },
-    { id: 3, url: 'img/3.jpg', keywords: ['bad', 'awkward'] },
-    { id: 4, url: 'img/4.jpg', keywords: ['sad', 'animal'] },
-    { id: 5, url: 'img/5.jpg', keywords: ['funny', 'happy'] },
-    { id: 6, url: 'img/6.jpg', keywords: ['nature', 'awkward'] },
-    { id: 7, url: 'img/7.jpg', keywords: ['bad', 'sad'] },
-    { id: 8, url: 'img/8.jpg', keywords: ['funny', 'nature'] },
-    { id: 9, url: 'img/9.jpg', keywords: ['animal', 'happy'] },
-    { id: 10, url: 'img/10.jpg', keywords: ['bad', 'funny'] },
-    { id: 11, url: 'img/11.jpg', keywords: ['awkward', 'sad'] },
-    { id: 12, url: 'img/12.jpg', keywords: ['nature', 'animal'] },
-    { id: 13, url: 'img/13.jpg', keywords: ['happy', 'bad'] },
-    { id: 14, url: 'img/14.jpg', keywords: ['funny', 'sad'] },
-    { id: 15, url: 'img/15.jpg', keywords: ['animal', 'awkward'] },
-    { id: 16, url: 'img/16.jpg', keywords: ['nature', 'happy'] },
-    { id: 17, url: 'img/17.jpg', keywords: ['bad', 'animal'] },
-    { id: 18, url: 'img/18.jpg', keywords: ['funny', 'nature'] }
+const gImgs = [
+    { id: 1, url: 'img/1.jpg', keywords: ['funny', 'cat'] },
+    { id: 2, url: 'img/2.jpg', keywords: ['funny', 'cat'] },
+    { id: 3, url: 'img/3.jpg', keywords: ['funny', 'cat', 'baby'] },
+    { id: 4, url: 'img/4.jpg', keywords: ['funny', 'cat'] },
+    { id: 5, url: 'img/5.jpg', keywords: ['funny', 'baby'] },
+    { id: 6, url: 'img/6.jpg', keywords: ['funny', 'man'] },
+    { id: 7, url: 'img/7.jpg', keywords: ['funny', 'baby'] },
+    { id: 8, url: 'img/8.jpg', keywords: ['funny', 'man'] },
+    { id: 9, url: 'img/9.jpg', keywords: ['funny', 'baby'] },
+    { id: 10, url: 'img/10.jpg', keywords: ['funny', 'man'] },
+    { id: 11, url: 'img/11.jpg', keywords: ['funny', 'man'] },
+    { id: 12, url: 'img/12.jpg', keywords: ['funny', 'man'] },
+    { id: 13, url: 'img/13.jpg', keywords: ['funny', 'man'] },
+    { id: 14, url: 'img/14.jpg', keywords: ['funny', 'man'] },
+    { id: 15, url: 'img/15.jpg', keywords: ['funny', 'man'] },
+    { id: 16, url: 'img/16.jpg', keywords: ['funny', 'man'] },
+    { id: 17, url: 'img/17.jpg', keywords: ['funny', 'man'] },
+    { id: 18, url: 'img/18.jpg', keywords: ['funny', 'man'] }
 ]
 
-var gMeme = {
+const gMeme = {
     selectedImgId: 1,
     selectedLineIdx: 0,
     lines: [
         {
-            txt: 'I sometimes eat Falafel',
-            size: 20,
-            color: '#ff0000',
+            txt: 'Enter Text',
+            size: 40,
+            align: 'center',
+            color: 'white',
+            fontFamily: 'Impact',
             x: 250,
             y: 50,
+            rotation: 0,
+            scale: 1,
             boxX: 0,
             boxY: 0,
             boxWidth: 0,
-            boxHeight: 0,
-            fontFamily: 'Arial',
-            align: 'center'
+            boxHeight: 0
         }
     ]
 }
@@ -51,11 +53,11 @@ function getImages() {
     return gImgs
 }
 
-function getImageById(imgId) {
-    return gImgs.find(img => img.id === imgId)
+function getImageById(id) {
+    return gImgs.find(img => img.id === id)
 }
 
-function setImg(imgId) {
+function setSelectedImg(imgId) {
     gMeme.selectedImgId = imgId
 }
 
@@ -63,58 +65,82 @@ function setLineTxt(txt, lineIdx) {
     gMeme.lines[lineIdx].txt = txt
 }
 
+function setSelectedLine(lineIdx) {
+    gMeme.selectedLineIdx = lineIdx
+}
+
 function addLine() {
     const newLine = {
-        txt: '',
-        size: 20,
-        color: '#ff0000',
+        txt: 'Enter Text',
+        size: 40,
+        align: 'center',
+        color: 'white',
+        fontFamily: 'Impact',
         x: 250,
-        y: gMeme.lines.length * 50 + 50,
+        y: 250,
+        rotation: 0,
+        scale: 1,
         boxX: 0,
         boxY: 0,
         boxWidth: 0,
-        boxHeight: 0,
-        fontFamily: 'Arial',
-        align: 'center'
+        boxHeight: 0
     }
     gMeme.lines.push(newLine)
     return gMeme.lines.length - 1
-}
-
-function setLineBox(lineIdx, boxX, boxY, boxWidth, boxHeight) {
-    gMeme.lines[lineIdx].boxX = boxX
-    gMeme.lines[lineIdx].boxY = boxY
-    gMeme.lines[lineIdx].boxWidth = boxWidth
-    gMeme.lines[lineIdx].boxHeight = boxHeight
-}
-
-function setFontFamily(fontFamily, lineIdx) {
-    gMeme.lines[lineIdx].fontFamily = fontFamily
-}
-
-function setColor(color, lineIdx) {
-    gMeme.lines[lineIdx].color = color
-}
-
-function setFontSize(size, lineIdx) {
-    gMeme.lines[lineIdx].size = size
-}
-
-function setAlignment(align, lineIdx) {
-    gMeme.lines[lineIdx].align = align
-}
-
-function adjustLinePosition(lineIdx, dy, canvasHeight) {
-    const line = gMeme.lines[lineIdx]
-    line.y = Math.max(0, Math.min(line.y + dy, canvasHeight))
 }
 
 function switchLine() {
     gMeme.selectedLineIdx = (gMeme.selectedLineIdx + 1) % gMeme.lines.length
 }
 
-function setSelectedLine(lineIdx) {
-    gMeme.selectedLineIdx = lineIdx
+function setFontSize(size, lineIdx) {
+    gMeme.lines[lineIdx].size = size
+}
+
+function setColor(color, lineIdx) {
+    gMeme.lines[lineIdx].color = color
+}
+
+function setFontFamily(fontFamily, lineIdx) {
+    gMeme.lines[lineIdx].fontFamily = fontFamily
+}
+
+function setAlignment(align, lineIdx) {
+    gMeme.lines[lineIdx].align = align
+}
+
+function setRotation(rotation, lineIdx) {
+    gMeme.lines[lineIdx].rotation = rotation
+}
+
+function setScale(scale, lineIdx) {
+    gMeme.lines[lineIdx].scale = scale
+}
+
+function setLineBox(lineIdx, x, y, width, height) {
+    gMeme.lines[lineIdx].boxX = x
+    gMeme.lines[lineIdx].boxY = y
+    gMeme.lines[lineIdx].boxWidth = width
+    gMeme.lines[lineIdx].boxHeight = height
+}
+
+function adjustLinePosition(lineIdx, deltaY, duration) {
+    const line = gMeme.lines[lineIdx]
+    const startY = line.y
+    const endY = startY + deltaY
+    const startTime = performance.now()
+
+    function animate(currentTime) {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        line.y = startY + (endY - startY) * progress
+
+        if (progress < 1) {
+            requestAnimationFrame(animate)
+        }
+    }
+
+    requestAnimationFrame(animate)
 }
 
 function saveMeme() {
