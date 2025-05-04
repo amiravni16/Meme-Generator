@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meme Generator</title>
+    <title data-trans="title">Meme Generator</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>LOGO</h1>
+            <h1 data-trans="title">Meme Generator</h1>
             <nav>
                 <ul>
-                    <li><a href="#">Gallery</a></li>
-                    <li><a href="#">About</a></li>
+                    <li><a href="#" data-trans="gallery">Gallery</a></li>
+                    <li><a href="#" data-trans="about">About</a></li>
                 </ul>
             </nav>
+            <div style="float:right;">
+                <button onclick="setLang('en')">English</button>
+                <button onclick="setLang('he')">עברית</button>
+            </div>
         </div>
     </header>
     <main class="container">
         <section id="gallery">
-            <h2>Image Gallery</h2>
+            <h2 data-trans="gallery">Image Gallery</h2>
             <div class="search-bar">
                 <input type="text" id="search-input" list="keyword-list" placeholder="Filter by keyword...">
                 <datalist id="keyword-list">
@@ -40,7 +44,7 @@
             </div>
         </section>
         <section id="editor" style="display: none;">
-            <h2>Meme Editor</h2>
+            <h2 data-trans="editor">Meme Editor</h2>
             <div id="editor-content" class="editor-layout">
                 <div class="canvas-container">
                     <canvas id="meme-canvas"></canvas>
@@ -58,13 +62,13 @@
                     </div>
                     <div class="control-row">
                         <div class="font-controls">
-                            <label for="font-family">Font:</label>
+                            <label for="font-family" data-trans="font-size">Font:</label>
                             <select id="font-family">
                                 <option value="Arial">Arial</option>
                                 <option value="Times New Roman">Times New Roman</option>
                                 <option value="Impact">Impact</option>
                             </select>
-                            <label for="font-color">Color:</label>
+                            <label for="font-color" data-trans="color">Color:</label>
                             <input type="color" id="font-color" value="#ff0000">
                             <button id="increase-font">A↑</button>
                             <button id="decrease-font">A↓</button>
@@ -83,19 +87,21 @@
                     </div>
                     <div class="control-row">
                         <div class="action-controls">
-                            <button id="save-btn">Save</button>
-                            <button id="share-btn">Share</button>
-                            <a href="#" id="download-link">Download</a>
+                            <button id="save-btn" data-trans="save">Save</button>
+                            <button id="share-btn" data-trans="share">Share</button>
+                            <a href="#" id="download-link" data-trans="download">Download</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+    <script src="js/i18n.js"></script>
     <script src="js/storage.service.js"></script>
     <script src="js/meme-service.js"></script>
     <script src="js/gallery-controller.js"></script>
     <script src="js/meme-controller.js"></script>
     <script src="js/main.js"></script>
+    <script>doTrans()</script>
 </body>
 </html>
