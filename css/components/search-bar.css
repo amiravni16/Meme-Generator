@@ -22,7 +22,11 @@
 }
 
 .search-bar button,
-.search-bar label.upload-btn {
+.search-bar label.upload-btn,
+#more-search-btn, 
+#clear-filter-btn, 
+#flexible-btn, 
+.upload-btn {
     border: none;
     border-radius: 24px;
     padding: 8px 18px;
@@ -39,15 +43,12 @@
     text-align: center;
 }
 
-.search-bar button#clear-filter-btn,
-.search-bar button#flexible-btn,
-.search-bar label.upload-btn {
-    background: #00b4d8;
-    color: #fff;
-}
-
 .search-bar button:hover,
-.search-bar label.upload-btn:hover {
+.search-bar label.upload-btn:hover,
+#more-search-btn:hover, 
+#clear-filter-btn:hover, 
+#flexible-btn:hover, 
+.upload-btn:hover {
     background: #0077b6;
     color: #fff;
 }
@@ -59,28 +60,6 @@
 
 .search-bar.show-actions .search-actions {
     display: flex;
-}
-
-#more-search-btn {
-    border: none;
-    border-radius: 24px;
-    padding: 8px 18px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    background: #00b4d8;
-    color: #fff;
-    margin: 0;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    display: inline-block;
-    min-width: 110px;
-    text-align: center;
-}
-
-#more-search-btn:hover {
-    background: #0077b6;
-    color: #fff;
 }
 
 @media (max-width: 700px) {
@@ -101,6 +80,7 @@
     align-items: center;
     justify-content: center;
     height: 44px;
+    line-height: 44px;
 }
 
 .upload-btn input[type="file"] {
@@ -111,4 +91,4 @@
     opacity: 0;
     cursor: pointer;
     z-index: 2;
-} 
+}
