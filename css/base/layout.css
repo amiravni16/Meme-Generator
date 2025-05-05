@@ -53,19 +53,74 @@ section {
     color: white;
 }
 
-.search-bar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 15px;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.search-bar input {
-    flex: 1;
-    padding: 12px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #23272f;
+    border-radius: 24px;
+    padding: 24px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    width: 100%;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1 1 0%;
+    display: flex;
+    align-items: center;
+    z-index: 3;
+}
+
+.rounded-search-input {
+    width: 100%;
+    padding: 22px 64px 22px 36px;
+    border-radius: 36px;
+    border: none !important;
+    background: #00bcd4 !important;
+    color: #fff !important;
+    font-size: 1.5rem;
+    outline: none;
+    transition: background 0.2s;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+.rounded-search-input:focus {
+    background: #0097a7 !important;
+}
+
+.rounded-search-input::placeholder {
+    color: #fff !important;
+    opacity: 1;
+    font-size: 1.5rem;
+}
+
+.keyword-bar {
+    margin-bottom: 0 !important;
+}
+
+.search-icon {
+    position: absolute;
+    right: 28px;
+    color: #00e676;
+    font-size: 1.7rem;
+    pointer-events: none;
+    z-index: 5;
 }
 
 #clear-filter-btn {
@@ -107,176 +162,193 @@ section {
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 28px;
+    padding: 24px 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .gallery-item {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    background: #23272f;
+    aspect-ratio: 1;
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    transition: transform 0.18s, box-shadow 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.gallery-item:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(0,230,118,0.18);
 }
 
 .gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.gallery-item img:hover {
-    transform: scale(1.05);
+    object-position: center;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
 /* Editor Layout */
 .editor-layout {
     display: flex;
-    gap: 20px;
+    flex-direction: row;
+    gap: 32px;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 600px;
+    box-sizing: border-box;
 }
 
 .canvas-container {
-    flex: 1;
+    flex: 1 1 50%;
+    max-width: 50%;
+    width: 100%;
     background-color: #333;
     border-radius: 10px;
     padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
 }
 
 #meme-canvas {
     max-width: 100%;
+    max-height: 80vh;
     height: auto;
     border-radius: 5px;
+    background: #222;
+    display: block;
 }
 
 .controls-panel {
-    flex: 0 0 300px;
+    flex: 0 0 420px;
+    max-width: 420px;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 22px;
+    padding: 10px 0 10px 0;
+    align-items: flex-end;
+    justify-content: flex-start;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
-.controls-panel > input {
-    margin-bottom: 15px;
-    padding: 12px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    width: 100%;
-}
-
-.line-controls,
-.font-controls,
-.emoji-controls,
-.action-controls {
-    background-color: #333;
-    padding: 15px;
-    border-radius: 10px;
+.controls-panel > .control-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    margin: 0;
+    max-width: 100%;
 }
 
-.line-controls button,
-.font-controls button,
-.emoji-controls button,
-.action-controls button {
-    padding: 12px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #444;
-    color: white;
+.controls-panel > .control-row.text-delete-row {
+    gap: 12px;
+}
+
+.controls-panel > .control-row.text-delete-row > #meme-text-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.controls-panel > .control-row > * {
+    flex: none;
+    width: auto;
     min-width: 48px;
-    min-height: 48px;
+    max-width: 160px;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.line-controls button:hover,
-.font-controls button:hover,
-.emoji-controls button:hover,
-.action-controls button:hover {
-    background-color: #555;
-}
-
-#font-family {
-    padding: 12px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #444;
-    color: white;
-    width: 100%;
-}
-
-#font-color {
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    background-color: #444;
-}
-
-#download-link {
-    padding: 12px 20px;
-    font-size: 1rem;
-    text-decoration: none;
-    background-color: #ab47bc;
-    color: white;
-    border-radius: 5px;
-    display: inline-block;
-    text-align: center;
-}
-
-#download-link:hover {
-    background-color: #8e24aa;
-}
-
-/* Controls alignment */
-.controls-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 10px;
-}
-
-.control-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#meme-text-input {
-    flex: 1;
-    padding: 12px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #444;
-    color: white;
-    height: 48px;
-    box-sizing: border-box;
-}
-
+.controls-panel button,
 .line-controls button,
 .font-controls button,
 .emoji-controls button,
 .action-controls button,
 .action-controls a {
-    padding: 12px;
+    padding: 8px 14px;
     font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #444;
-    color: white;
-    min-width: 48px;
-    min-height: 48px;
+    border: 2px solid #00bcd4;
+    border-radius: 24px;
+    cursor: pointer;
+    background: linear-gradient(90deg, #00e676 0%, #00bcd4 100%);
+    color: #222;
+    min-width: 36px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0,188,212,0.10);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0 6px;
+    transition: background 0.18s, color 0.18s, transform 0.18s, box-shadow 0.18s, border 0.18s;
+}
+
+.controls-panel button:hover,
+.line-controls button:hover,
+.font-controls button:hover,
+.emoji-controls button:hover,
+.action-controls button:hover,
+.action-controls a:hover {
+    background: linear-gradient(90deg, #00bcd4 0%, #00e676 100%);
+    color: #111;
+    border: 2px solid #00e676;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(0,230,118,0.18);
+}
+
+@media (max-width: 600px) {
+  .controls-panel > .control-row {
+    flex-wrap: wrap;
+  }
+}
+
+#meme-text-input {
+    width: 100%;
+    padding: 18px 22px;
+    font-size: 1.25rem;
+    border-radius: 18px;
+    border: none;
+    background: #393e46;
+    color: #fff;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    outline: none;
+    margin-top: 0;
+}
+
+#meme-text-input:focus {
+    background: #50555e;
+}
+
+.font-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
 }
 
 .font-controls select,
@@ -293,22 +365,6 @@ section {
 
 .font-controls label {
     margin-right: 5px;
-}
-
-.action-controls a {
-    text-decoration: none;
-    color: white;
-    padding: 12px 20px;
-    background-color: #ab47bc;
-    border-radius: 5px;
-    display: inline-block;
-    text-align: center;
-    height: 48px;
-    box-sizing: border-box;
-}
-
-.action-controls a:hover {
-    background-color: #8e24aa;
 }
 
 /* Styles for Save button and Saved Memes */
@@ -440,3 +496,50 @@ section {
         flex: 0 0 300px;
     }
 }
+
+@media (max-width: 900px) {
+  .editor-layout {
+    flex-direction: column;
+    gap: 24px;
+    min-height: unset;
+  }
+  .canvas-container,
+  .controls-panel {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+.share-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #222;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    padding: 8px 0;
+    min-width: 180px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.share-dropdown button {
+    background: none;
+    border: none;
+    color: #fff;
+    text-align: left;
+    padding: 12px 24px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.18s, color 0.18s;
+}
+
+.share-dropdown button:hover {
+    background: #00bcd4;
+    color: #222;
+}
+
+.control-row { position: relative; }

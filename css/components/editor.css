@@ -1,0 +1,215 @@
+.editor-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.canvas-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8faff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 16px;
+}
+
+#meme-canvas {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.controls-panel {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #f8faff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 24px 20px;
+}
+
+.control-row,
+.control-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+    justify-content: flex-start;
+}
+
+.control-row.text-delete-row {
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+.control-row input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid #bde0fe;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.control-row input[type="text"]:focus {
+    border-color: #00b4d8;
+}
+
+.controls-panel button,
+.controls-panel select,
+.controls-panel input[type="color"] {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    background: #00b4d8;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.controls-panel button:hover,
+.controls-panel select:hover {
+    background: #0077b6;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 12px rgba(0,180,216,0.10);
+}
+
+.controls-panel input[type="color"] {
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: 1.5px solid #bde0fe;
+    box-shadow: none;
+}
+
+.controls-panel label {
+    font-size: 1rem;
+    color: #333;
+    margin-right: 4px;
+    min-width: 48px;
+}
+
+.control-group {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Emoji row spacing */
+.control-row:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Share button row */
+#share-dropdown-btn {
+    padding: 14px 36px;
+    font-size: 1.15rem;
+    border-radius: 8px;
+    min-width: 160px;
+    margin: 0 auto;
+    display: block;
+}
+
+#share-dropdown {
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+}
+
+/* Emoji Panel Styles */
+.control-row.emoji-panel-row {
+    justify-content: space-between; /* Pushes arrows to ends */
+    align-items: center;
+    gap: 8px; /* Space between arrows and display area */
+}
+
+#emoji-display-area {
+    display: flex;
+    gap: 6px; /* Space between emoji buttons */
+    flex-grow: 1; /* Allows it to take space */
+    justify-content: center; /* Center emojis if fewer than 4 */
+}
+
+#emoji-display-area button {
+    flex: 0 0 auto; /* Prevent stretching */
+    padding: 6px 8px; /* Smaller padding for emoji buttons */
+    font-size: 1.2rem; /* Slightly larger emoji */
+    min-width: 36px; /* Ensure button size */
+    min-height: 36px;
+    line-height: 1; /* Adjust line height for single emoji */
+}
+
+#emoji-prev-btn, #emoji-next-btn {
+    flex: 0 0 auto; /* Prevent stretching */
+    padding: 6px 10px;
+    font-size: 1rem;
+    min-width: 30px;
+}
+
+#emoji-prev-btn:disabled, #emoji-next-btn:disabled {
+    background: #90e0ef; /* Lighter blue when disabled */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Focus Styles for Accessibility */
+.controls-panel button:focus-visible,
+.controls-panel select:focus-visible,
+.controls-panel input[type="color"]:focus-visible,
+.controls-panel input[type="text"]:focus-visible {
+    outline: 2px solid #0077b6;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2);
+}
+
+@media (max-width: 600px) {
+    .controls-panel {
+        flex: 1 1 100%;
+        padding: 12px 6px;
+        gap: 12px;
+    }
+    .control-row, .control-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    #share-dropdown-btn {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+.line-controls, .font-controls, .emoji-controls, .action-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.line-controls button, .font-controls button, .emoji-controls button, .action-controls button, .action-controls a {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #00b4d8;
+    color: #fff;
+    transition: background 0.2s;
+}
+
+.line-controls button:hover, .font-controls button:hover, .emoji-controls button:hover, .action-controls button:hover, .action-controls a:hover {
+    background: #0077b6;
+} 

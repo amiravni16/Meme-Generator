@@ -26,13 +26,28 @@ const gMeme = {
     selectedLineIdx: 0,
     lines: [
         {
-            txt: 'Enter Text',
+            txt: 'Top Text',
             size: 40,
             align: 'center',
             color: 'white',
             fontFamily: 'Impact',
             x: 250,
             y: 50,
+            rotation: 0,
+            scale: 1,
+            boxX: 0,
+            boxY: 0,
+            boxWidth: 0,
+            boxHeight: 0
+        },
+        {
+            txt: 'Bottom Text',
+            size: 40,
+            align: 'center',
+            color: 'white',
+            fontFamily: 'Impact',
+            x: 250,
+            y: 450,
             rotation: 0,
             scale: 1,
             boxX: 0,
@@ -106,7 +121,19 @@ function setFontFamily(fontFamily, lineIdx) {
 }
 
 function setAlignment(align, lineIdx) {
-    gMeme.lines[lineIdx].align = align
+    const line = gMeme.lines[lineIdx]
+    line.align = align
+
+    const canvasWidth = 500 // Assuming canvas width is fixed at 500 for now
+    const padding = 10
+
+    if (align === 'left') {
+        line.x = padding
+    } else if (align === 'center') {
+        line.x = canvasWidth / 2
+    } else if (align === 'right') {
+        line.x = canvasWidth - padding
+    }
 }
 
 function setRotation(rotation, lineIdx) {

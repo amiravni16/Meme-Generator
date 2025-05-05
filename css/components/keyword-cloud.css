@@ -1,29 +1,57 @@
-.keyword-cloud {
-    background-color: #f0ad4e;
-    padding: 10px;
+.keyword-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #00bcd4 !important;
+    border-radius: 32px;
+    padding: 10px 24px;
+    overflow-x: auto;
     margin-bottom: 20px;
-    border-radius: 5px;
-    text-align: center;
+    scrollbar-width: thin;
+    scrollbar-color: #00e676 #393e46;
 }
 
-.keyword {
+.keyword-pill {
     display: inline-block;
-    margin: 0 10px;
-    color: white;
+    padding: 8px 20px;
+    background: #eeeeee;
+    color: #222;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
     cursor: pointer;
-    font-family: Arial, sans-serif;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    white-space: nowrap;
 }
 
-.keyword:hover {
-    color: #ddd;
+.keyword-pill.popular {
+    background: #00e676;
+    color: #222;
+    font-weight: bold;
+    font-size: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,230,118,0.15);
 }
 
-.inline-input {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    padding: 2px;
-    box-sizing: border-box;
-    outline: none;
+.keyword-pill:hover {
+    background: #b2ff59;
+    color: #111;
+    transform: translateY(-2px) scale(1.05);
+}
+
+#more-search-btn {
+    background: #00e676;
+    color: #222;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+
+#more-search-btn:hover {
+    background: #69f0ae;
+    color: #111;
 }

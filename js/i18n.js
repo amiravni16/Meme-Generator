@@ -55,15 +55,99 @@ const gTrans = {
         en: 'About',
         he: 'אודות'
     },
+    'text-label': {
+        en: 'Text:',
+        he: 'טקסט:'
+    },
+    'delete-line': {
+        en: 'Delete',
+        he: 'מחק'
+    },
+    'move-up': {
+        en: 'Move Up',
+        he: 'הזז למעלה'
+    },
+    'move-down': {
+        en: 'Move Down',
+        he: 'הזז למטה'
+    },
+    'switch-line': {
+        en: 'Switch Line',
+        he: 'החלף שורה'
+    },
+    'increase-font': {
+        en: 'Increase Font',
+        he: 'הגדל גופן'
+    },
+    'decrease-font': {
+        en: 'Decrease Font',
+        he: 'הקטן גופן'
+    },
+    'color-label': {
+        en: 'Color:',
+        he: 'צבע:'
+    },
+    'align-left': {
+        en: 'Align Left',
+        he: 'יישור שמאלה'
+    },
+    'align-center': {
+        en: 'Align Center',
+        he: 'יישור למרכז'
+    },
+    'align-right': {
+        en: 'Align Right',
+        he: 'יישור ימינה'
+    },
+    'font-label': {
+        en: 'Font:',
+        he: 'גופן:'
+    },
+    'font-family': {
+        en: 'Font Family',
+        he: 'משפחת גופנים'
+    },
+    'emoji1': {
+        en: 'Emoji 1',
+        he: 'אימוג׳י 1'
+    },
+    'emoji2': {
+        en: 'Emoji 2',
+        he: 'אימוג׳י 2'
+    },
+    'emoji3': {
+        en: 'Emoji 3',
+        he: 'אימוג׳י 3'
+    },
+    'emoji4': {
+        en: 'Emoji 4',
+        he: 'אימוג׳י 4'
+    },
+    'share': {
+        en: 'Share',
+        he: 'שתף'
+    },
+    'download-image': {
+        en: 'Download Image',
+        he: 'הורד תמונה'
+    },
+    'save-to-memes': {
+        en: 'Save to Memes',
+        he: 'שמור לממים'
+    },
+    'share-facebook': {
+        en: 'Share on Facebook',
+        he: 'שתף בפייסבוק'
+    },
     // Add more keys as needed
 }
 
-let gCurrLang = 'en'
+var gCurrLang = 'en'
 
 function getTrans(key) {
     const transMap = gTrans[key]
     if (!transMap) return 'UNKNOWN'
-    let txt = transMap[gCurrLang]
+    var txt = transMap[gCurrLang]
     if (!txt) txt = transMap['en']
     return txt
 }

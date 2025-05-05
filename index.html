@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-trans="title">Meme Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Impact&family=Arial&family=Times+New+Roman&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -13,6 +16,7 @@
             <nav class="main-nav">
                 <ul style="display: flex; gap: 32px; align-items: center; margin: 0;">
                     <li><a href="#" data-trans="gallery">Gallery</a></li>
+                    <li><a href="#" id="memes-nav-btn">Memes</a></li>
                     <li><a href="#" data-trans="about">About</a></li>
                 </ul>
             </nav>
@@ -26,12 +30,15 @@
         <section id="gallery">
             <h2 data-trans="gallery">Image Gallery</h2>
             <div class="search-bar">
-                <input type="text" id="search-input" list="keyword-list" placeholder="Filter by keyword...">
+                <div class="search-input-wrapper">
+                    <input type="text" id="search-input" list="keyword-list" placeholder="Search" class="rounded-search-input">
+                    <span class="search-icon">🔍</span>
+                </div>
                 <datalist id="keyword-list">
                 </datalist>
+                <div id="keyword-bar" class="keyword-bar"></div>
                 <button id="more-search-btn" type="button">More</button>
                 <div class="search-actions">
-                    <button id="clear-filter-btn">Clear</button>
                     <button id="flexible-btn">I'm flexible</button>
                     <label for="upload-image-btn" class="upload-btn">Upload Image</label>
                     <input type="file" id="upload-image-btn" accept="image/*" style="display: none;">
@@ -47,58 +54,71 @@
             </div>
         </section>
         <section id="editor" style="display: none;">
+            <div id="save-annotation" style="display:none; color:#00e676; font-weight:bold; text-align:center; margin-bottom:10px; font-size:1.1rem;"></div>
             <h2 data-trans="editor">Meme Editor</h2>
             <div id="editor-content" class="editor-layout">
                 <div class="canvas-container">
                     <canvas id="meme-canvas"></canvas>
                 </div>
                 <div class="controls-panel">
-                    <div class="control-row">
-                        <input type="text" id="meme-text-input" placeholder="Enter text..." style="flex: 1; padding: 5px;">
-                        <div class="line-controls">
-                            <button id="move-up-btn">↑</button>
-                            <button id="move-down-btn">↓</button>
-                            <button id="switch-line-btn">↕</button>
-                            <button id="add-line-btn">+</button>
-                            <button id="delete-line-btn">🗑️</button>
-                        </div>
+                    <div class="control-row text-delete-row">
+                        <label for="meme-text-input" data-trans="text-label">Text:</label>
+                        <input type="text" id="meme-text-input" placeholder="Enter text...">
+                        <button id="delete-line-btn" title="Delete line">🗑️</button>
                     </div>
+
                     <div class="control-row">
-                        <div class="font-controls">
-                            <label for="font-family" data-trans="font-size">Font:</label>
-                            <select id="font-family">
-                                <option value="Arial">Arial</option>
-                                <option value="Times New Roman">Times New Roman</option>
-                                <option value="Impact">Impact</option>
-                            </select>
-                            <label for="font-color" data-trans="color">Color:</label>
-                            <input type="color" id="font-color" value="#ff0000">
-                            <button id="increase-font">A↑</button>
-                            <button id="decrease-font">A↓</button>
-                            <button id="align-left" class="align-btn">⬅️</button>
-                            <button id="align-center" class="align-btn">⏺️</button>
-                            <button id="align-right" class="align-btn">➡️</button>
-                        </div>
+                        <button id="move-up-btn" title="Move up">↑</button>
+                        <button id="move-down-btn" title="Move down">↓</button>
+                        <button id="switch-line-btn" title="Switch line">↕</button>
                     </div>
+
                     <div class="control-row">
-                        <div class="emoji-controls">
-                            <button id="emoji1">😄</button>
-                            <button id="emoji2">😂</button>
-                            <button id="emoji3">😢</button>
-                            <button id="emoji4">😡</button>
-                        </div>
+                        <button id="increase-font" title="Increase font size">A↑</button>
+                        <button id="decrease-font" title="Decrease font size">A↓</button>
+                        <label for="font-color" data-trans="color-label">Color:</label>
+                        <input type="color" id="font-color" value="#ff0000" title="Font color">
                     </div>
+
                     <div class="control-row">
-                        <div class="action-controls">
-                            <button id="save-btn" data-trans="save">Save</button>
-                            <button id="share-btn" data-trans="share">Share</button>
-                            <a href="#" id="download-link" data-trans="download">Download</a>
+                        <button id="align-left" class="align-btn" title="Align left">⬅️</button>
+                        <button id="align-center" class="align-btn" title="Align center">⏺️</button>
+                        <button id="align-right" class="align-btn" title="Align right">➡️</button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="font-family" data-trans="font-label">Font:</label>
+                        <select id="font-family" class="control-btn">
+                            <option value="Impact">Impact</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                        </select>
+                    </div>
+
+                    <div class="control-row emoji-panel-row">
+                        <button id="emoji-prev-btn" title="Previous emojis">◀</button>
+                        <div id="emoji-display-area">
+                            <!-- Emojis will be dynamically inserted here -->
+                        </div>
+                        <button id="emoji-next-btn" title="Next emojis">▶</button>
+                    </div>
+
+                    <div class="control-row" style="justify-content: center; margin-top: 16px;">
+                        <button id="share-dropdown-btn" type="button" data-trans="share" style="padding: 12px 32px; font-size: 1.1rem; border-radius: 6px; min-width: 140px;">Share</button>
+                        <div id="share-dropdown" class="share-dropdown" style="display: none;">
+                            <button id="download-image-btn" type="button" data-trans="download-image">Download Image</button>
+                            <button id="save-meme-btn" type="button" data-trans="save-to-memes">Save to Memes</button>
+                            <button id="share-facebook-btn" type="button" data-trans="share-facebook">Share on Facebook</button>
+                            <button id="share-api-btn" type="button">Other ways to share</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+    <footer style="text-align:center; padding: 24px 0 12px 0; color: #888; font-size: 1rem; background: #f8f8f8; margin-top: 40px;">
+        &copy; Amir Avni, Sprint #2, Coding Academy
+    </footer>
     <script src="js/i18n.js"></script>
     <script src="js/storage.service.js"></script>
     <script src="js/meme-service.js"></script>
