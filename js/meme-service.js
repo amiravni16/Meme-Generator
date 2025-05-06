@@ -124,7 +124,7 @@ function setAlignment(align, lineIdx) {
     const line = gMeme.lines[lineIdx]
     line.align = align
 
-    const canvasWidth = 500 // Assuming canvas width is fixed at 500 for now
+    const canvasWidth = 500 
     const padding = 10
 
     if (align === 'left') {

@@ -163,5 +163,5 @@ function doTrans() {
         const key = el.getAttribute('data-trans')
         el.innerText = getTrans(key)
     })
-    // document.body.dir = (gCurrLang === 'he') ? 'rtl' : 'ltr'
+
 } 

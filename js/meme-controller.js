@@ -13,7 +13,14 @@ var isResizing = false
 var isRotating = false
 var resizeHandleSize = 12
 var rotateHandleSize = 12
-var tooltipTimeout = null
+
+// Double tap detection variables
+var lastTapTime = 0
+var lastTapLineIdx = -1
+var lastTapX = 0
+var lastTapY = 0
+const DOUBLE_TAP_TIME_THRESHOLD = 300
+const DOUBLE_TAP_POS_THRESHOLD = 20
 
 // Emoji Panel State
 const ALL_EMOJIS = ['😄', '😂', '😢', '😡', '👍', '👎', '❤️', '⭐', '🔥', '🎉', '🤔', '💡', '💩', '👻', '💀', '👽']
@@ -72,7 +79,7 @@ function initEditorControls() {
         switchLine()
         const meme = getMeme()
         selectedLineIdx = meme.selectedLineIdx
-        document.getElementById('meme-text-input').value = meme.lines[0].txt
+        document.getElementById('meme-text-input').value = meme.lines[meme.selectedLineIdx].txt
         renderMeme()
     })
 
@@ -86,6 +93,15 @@ function initEditorControls() {
             document.getElementById('meme-text-input').value = meme.lines[0].txt
             renderMeme()
         }
+    })
+    
+    const addLineBtn = document.getElementById('add-line-btn')
+    if (addLineBtn) addLineBtn.addEventListener('click', () => {
+        const newLineIdx = addLine()
+        selectedLineIdx = newLineIdx
+        setSelectedLine(newLineIdx)
+        document.getElementById('meme-text-input').value = getMeme().lines[newLineIdx].txt
+        renderMeme()
     })
 
     const fontFamily = document.getElementById('font-family')
@@ -145,20 +161,13 @@ function initEditorControls() {
         renderMeme()
     })
 
-    // Remove old individual emoji listeners if they exist
     const oldEmojiIds = ['emoji1', 'emoji2', 'emoji3', 'emoji4']
     oldEmojiIds.forEach(id => {
         const el = document.getElementById(id)
-        // Simple check if it's a button to avoid removing unrelated elements
         if (el && el.tagName === 'BUTTON') {
-            // In a real scenario, you'd remove specific listeners,
-            // but replacing the element via innerHTML or removing it entirely is simpler here
-            // Since the HTML was changed, the old elements/listeners are effectively gone, 
-            // but this is belt-and-suspenders.
         }
     })
 
-    // New Emoji Panel Logic
     const emojiPrevBtn = document.getElementById('emoji-prev-btn')
     const emojiNextBtn = document.getElementById('emoji-next-btn')
 
@@ -181,7 +190,7 @@ function initEditorControls() {
         })
     }
 
-    renderEmojiPanel() // Initial render
+    renderEmojiPanel()
 
     // Share dropdown logic
     const shareDropdownBtn = document.getElementById('share-dropdown-btn')
@@ -289,7 +298,19 @@ function createInlineInput(lineIdx) {
     } else if (line.align === 'right') {
         left -= width
     }
-    const top = canvasRect.top + line.y - (line.size / 2) + window.scrollY
+
+    const lineHeight = line.size
+    let top = canvasRect.top + line.y - (lineHeight / 2) + window.scrollY
+
+    if (lineIdx === 1 || line.y > gElCanvas.height / 2) {
+        top = canvasRect.top + line.y - lineHeight - 10 + window.scrollY
+    }
+    
+    const canvasBottom = canvasRect.top + canvasRect.height
+    if (top + lineHeight > canvasBottom) {
+        top = canvasBottom - lineHeight - 5
+    }
+
     input.style.left = `${left}px`
     input.style.top = `${top}px`
 
@@ -395,6 +416,93 @@ function initCanvasDragAndDrop() {
         }
     })
 
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault()
+        const rect = canvas.getBoundingClientRect()
+        const touch = e.touches[0]
+        
+        const touchX = touch.clientX - rect.left
+        const touchY = touch.clientY - rect.top
+
+        const meme = getMeme()
+        
+        const sortedLineIndices = Array.from({length: meme.lines.length}, (_, i) => i)
+            .sort((a, b) => meme.lines[a].y - meme.lines[b].y);
+        
+        let clickedLineIdx = -1;
+        let minDistance = Infinity;
+        
+        for (let i = 0; i < sortedLineIndices.length; i++) {
+            const lineIndex = sortedLineIndices[i];
+            const line = meme.lines[lineIndex];
+            
+            const distance = Math.sqrt(
+                Math.pow(touchX - line.x, 2) + 
+                Math.pow(touchY - line.y, 2)
+            );
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                clickedLineIdx = lineIndex;
+            }
+        }
+        
+        if (minDistance > 150) {
+            clickedLineIdx = -1;
+        }
+
+        if (clickedLineIdx !== -1) {
+            selectedLineIdx = clickedLineIdx
+            meme.selectedLineIdx = clickedLineIdx
+            setSelectedLine(clickedLineIdx)
+            document.getElementById('meme-text-input').value = meme.lines[clickedLineIdx].txt
+            const line = meme.lines[clickedLineIdx]
+            const centerX = line.x
+            const centerY = line.y
+            const angle = (line.rotation * Math.PI) / 180
+            const cos = Math.cos(angle)
+            const sin = Math.sin(angle)
+
+            const resizeHandleX = centerX + (line.boxWidth / 2) * cos - (line.boxHeight / 2) * sin
+            const resizeHandleY = centerY + (line.boxWidth / 2) * sin + (line.boxHeight / 2) * cos
+            const resizeHandleDist = Math.sqrt(
+                Math.pow(touchX - resizeHandleX, 2) + Math.pow(touchY - resizeHandleY, 2)
+            )
+
+            const rotateHandleX = centerX - (line.boxHeight / 2) * sin
+            const rotateHandleY = centerY + (line.boxHeight / 2) * cos
+            const rotateHandleDist = Math.sqrt(
+                Math.pow(touchX - rotateHandleX, 2) + Math.pow(touchY - rotateHandleY, 2)
+            )
+
+            if (resizeHandleDist <= resizeHandleSize) {
+                isResizing = true
+                draggedLineIdx = clickedLineIdx
+                dragOffsetX = touchX - resizeHandleX
+                dragOffsetY = touchY - resizeHandleY
+            } else if (rotateHandleDist <= rotateHandleSize) {
+                isRotating = true
+                draggedLineIdx = clickedLineIdx
+                dragOffsetX = touchX - centerX
+                dragOffsetY = touchY - centerY
+            } else {
+                isDragging = true
+                draggedLineIdx = clickedLineIdx
+                dragOffsetX = touchX - line.x
+                dragOffsetY = touchY - line.y
+                selectedLineIdx = clickedLineIdx
+                setSelectedLine(selectedLineIdx)
+                document.getElementById('meme-text-input').value = line.txt
+            }
+            renderMeme()
+        } else {
+            selectedLineIdx = -1
+            setSelectedLine(-1)
+            document.getElementById('meme-text-input').value = ''
+            renderMeme()
+        }
+    })
+
     canvas.addEventListener('mousemove', (e) => {
         if (draggedLineIdx === -1) {
             const rect = canvas.getBoundingClientRect()
@@ -479,6 +587,121 @@ function initCanvasDragAndDrop() {
         }
     })
 
+    canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault()
+        if (draggedLineIdx === -1) {
+            return;
+        }
+
+        const rect = canvas.getBoundingClientRect()
+        const touch = e.touches[0]
+        const touchX = touch.clientX - rect.left
+        const touchY = touch.clientY - rect.top
+
+        const meme = getMeme()
+        
+        if (draggedLineIdx >= 0 && draggedLineIdx < meme.lines.length) {
+            const line = meme.lines[draggedLineIdx]
+
+            if (isResizing) {
+                const centerX = line.x
+                const centerY = line.y
+                const angle = (line.rotation * Math.PI) / 180
+                const cos = Math.cos(angle)
+                const sin = Math.sin(angle)
+
+                const dx = touchX - centerX
+                const dy = touchY - centerY
+                const newWidth = Math.max(50, Math.abs(dx * cos + dy * sin) * 2)
+                const newHeight = Math.max(20, Math.abs(-dx * sin + dy * cos) * 2)
+
+                const scaleX = newWidth / line.boxWidth
+                const scaleY = newHeight / line.boxHeight
+                const newScale = Math.min(scaleX, scaleY)
+                setScale(newScale, draggedLineIdx)
+            } else if (isRotating) {
+                const centerX = line.x
+                const centerY = line.y
+                const dx = touchX - centerX
+                const dy = touchY - centerY
+                const newRotation = (Math.atan2(dy, dx) * 180) / Math.PI
+                setRotation(newRotation, draggedLineIdx)
+            } else if (isDragging) {
+                line.x = Math.max(0, Math.min(touchX - dragOffsetX, gElCanvas.width))
+                line.y = Math.max(0, Math.min(touchY - dragOffsetY, gElCanvas.height))
+            }
+            
+            renderMeme()
+        }
+    })
+
+    canvas.addEventListener('touchend', function(e) {
+        e.preventDefault()
+
+        const rect = canvas.getBoundingClientRect()
+        const touch = e.changedTouches[0]
+        
+        const touchX = touch.clientX - rect.left
+        const touchY = touch.clientY - rect.top
+
+        const meme = getMeme()
+        
+        const sortedLineIndices = Array.from({length: meme.lines.length}, (_, i) => i)
+            .sort((a, b) => meme.lines[a].y - meme.lines[b].y);
+        
+        let clickedLineIdx = -1;
+        let minDistance = Infinity;
+        
+        for (let i = 0; i < sortedLineIndices.length; i++) {
+            const lineIndex = sortedLineIndices[i];
+            const line = meme.lines[lineIndex];
+            
+            const distance = Math.sqrt(
+                Math.pow(touchX - line.x, 2) + 
+                Math.pow(touchY - line.y, 2)
+            );
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                clickedLineIdx = lineIndex;
+            }
+        }
+        
+        if (minDistance > 150) {
+            clickedLineIdx = -1;
+        }
+
+        const currentTime = new Date().getTime()
+        const timeSinceLastTap = currentTime - lastTapTime
+
+        if (clickedLineIdx !== -1 && 
+            timeSinceLastTap < DOUBLE_TAP_TIME_THRESHOLD && 
+            lastTapLineIdx === clickedLineIdx &&
+            Math.abs(touchX - lastTapX) < DOUBLE_TAP_POS_THRESHOLD &&
+            Math.abs(touchY - lastTapY) < DOUBLE_TAP_POS_THRESHOLD) {
+            
+            createInlineInput(clickedLineIdx)
+            lastTapTime = 0
+            lastTapLineIdx = -1
+        } else {
+            if (clickedLineIdx !== -1) {
+                lastTapLineIdx = clickedLineIdx
+                lastTapX = touchX
+                lastTapY = touchY
+            } else {
+                lastTapLineIdx = -1
+            }
+            lastTapTime = currentTime
+        }
+
+        isDragging = false
+        isResizing = false
+        isRotating = false
+        draggedLineIdx = -1
+        tooltip.style.display = 'none'
+        renderMeme()
+    })
+
     canvas.addEventListener('mouseup', () => {
         isDragging = false
         isResizing = false
@@ -540,7 +763,7 @@ function renderMeme() {
         gCtx.restore()
 
         const textMetrics = gCtx.measureText(line.txt)
-        const padding = 5
+        const padding = 10
         const boxWidth = textMetrics.width + (padding * 2)
         const boxHeight = (line.size * line.scale) + (padding * 2)
         
@@ -554,6 +777,12 @@ function renderMeme() {
         } else {
             actualBoxX = line.x
         }
+        
+        line.boxX = actualBoxX
+        line.boxY = actualBoxY
+        line.boxWidth = boxWidth
+        line.boxHeight = boxHeight
+        
         setLineBox(idx, actualBoxX, actualBoxY, boxWidth, boxHeight)
 
         if (idx === meme.selectedLineIdx) {
@@ -600,7 +829,6 @@ function onShareImg(ev) {
     ev.preventDefault()
     const canvasData = gElCanvas.toDataURL('image/jpeg')
 
-    // After a succesful upload, allow the user to share on Facebook
     function onSuccess(uploadedImgUrl) {
         const encodedUploadedImgUrl = encodeURIComponent(uploadedImgUrl)
         console.log('encodedUploadedImgUrl:', encodedUploadedImgUrl)
@@ -632,7 +860,6 @@ function showSaveAnnotation() {
     const annotation = document.getElementById('save-annotation')
     if (!annotation) return
     
-    // Set styles for better visibility
     annotation.style.position = 'fixed'
     annotation.style.top = '20px'
     annotation.style.right = '20px'
@@ -666,7 +893,7 @@ function renderEmojiPanel() {
     const endIdx = startIdx + EMOJIS_PER_PAGE
     const emojisToShow = ALL_EMOJIS.slice(startIdx, endIdx)
 
-    emojiDisplayArea.innerHTML = '' // Clear previous emojis
+    emojiDisplayArea.innerHTML = ''
 
     emojisToShow.forEach(emoji => {
         const button = document.createElement('button')
@@ -675,9 +902,8 @@ function renderEmojiPanel() {
         button.addEventListener('click', () => {
             const textInput = document.getElementById('meme-text-input')
             const meme = getMeme()
-            // Use selected line index, default to 0 if none selected
             const lineIdx = meme.selectedLineIdx >= 0 ? meme.selectedLineIdx : 0
-            const currentText = meme.lines[lineIdx]?.txt || '' // Handle potential undefined line
+            const currentText = meme.lines[lineIdx]?.txt || ''
             const newText = currentText + emoji
             setLineTxt(newText, lineIdx)
             textInput.value = newText
@@ -686,7 +912,6 @@ function renderEmojiPanel() {
         emojiDisplayArea.appendChild(button)
     })
 
-    // Update button states
     const emojiPrevBtn = document.getElementById('emoji-prev-btn')
     const emojiNextBtn = document.getElementById('emoji-next-btn')
     const maxPage = Math.ceil(ALL_EMOJIS.length / EMOJIS_PER_PAGE) - 1

@@ -128,7 +128,7 @@ section {
     font-size: 1rem;
     border: none;
     border-radius: 5px;
-    background-color: #f44336; /* Red for clear button */
+    background-color: #f44336; 
     color: white;
     cursor: pointer;
     min-width: 48px;
@@ -139,7 +139,7 @@ section {
 }
 
 #clear-filter-btn:hover {
-    background-color: #d32f2f; /* Darker red on hover */
+    background-color: #d32f2f; 
 }
 
 #flexible-btn {
@@ -367,7 +367,7 @@ section {
     margin-right: 5px;
 }
 
-/* Styles for Save button and Saved Memes */
+
 #save-btn {
     padding: 12px 20px;
     font-size: 1rem;

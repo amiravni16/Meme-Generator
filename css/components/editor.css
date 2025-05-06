@@ -109,12 +109,12 @@
     margin-bottom: 0;
 }
 
-/* Emoji row spacing */
+
 .control-row:last-of-type {
     margin-bottom: 0;
 }
 
-/* Share button row */
+
 #share-dropdown-btn {
     padding: 14px 36px;
     font-size: 1.15rem;
@@ -130,43 +130,43 @@
     min-width: 200px;
 }
 
-/* Emoji Panel Styles */
+
 .control-row.emoji-panel-row {
-    justify-content: space-between; /* Pushes arrows to ends */
+    justify-content: space-between;
     align-items: center;
-    gap: 8px; /* Space between arrows and display area */
+    gap: 8px; 
 }
 
 #emoji-display-area {
     display: flex;
-    gap: 6px; /* Space between emoji buttons */
-    flex-grow: 1; /* Allows it to take space */
-    justify-content: center; /* Center emojis if fewer than 4 */
+    gap: 6px; 
+    flex-grow: 1; 
+    justify-content: center; 
 }
 
 #emoji-display-area button {
-    flex: 0 0 auto; /* Prevent stretching */
-    padding: 6px 8px; /* Smaller padding for emoji buttons */
-    font-size: 1.2rem; /* Slightly larger emoji */
-    min-width: 36px; /* Ensure button size */
+    flex: 0 0 auto; 
+    padding: 6px 8px; 
+    font-size: 1.2rem; 
+    min-width: 36px; 
     min-height: 36px;
-    line-height: 1; /* Adjust line height for single emoji */
+    line-height: 1; 
 }
 
 #emoji-prev-btn, #emoji-next-btn {
-    flex: 0 0 auto; /* Prevent stretching */
+    flex: 0 0 auto; 
     padding: 6px 10px;
     font-size: 1rem;
     min-width: 30px;
 }
 
 #emoji-prev-btn:disabled, #emoji-next-btn:disabled {
-    background: #90e0ef; /* Lighter blue when disabled */
+    background: #90e0ef; 
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-/* Focus Styles for Accessibility */
+
 .controls-panel button:focus-visible,
 .controls-panel select:focus-visible,
 .controls-panel input[type="color"]:focus-visible,

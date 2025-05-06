@@ -6,7 +6,21 @@
     <title data-trans="title">Meme Generator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Impact&family=Arial&family=Times+New+Roman&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Impact';
+            src: local('Impact');
+        }
+        @font-face {
+            font-family: 'Arial';
+            src: local('Arial');
+        }
+        @font-face {
+            font-family: 'Times New Roman';
+            src: local('Times New Roman');
+        }
+    </style>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -64,6 +78,7 @@
                     <div class="control-row text-delete-row">
                         <label for="meme-text-input" data-trans="text-label">Text:</label>
                         <input type="text" id="meme-text-input" placeholder="Enter text...">
+                        <button id="add-line-btn" title="Add new line">➕</button>
                         <button id="delete-line-btn" title="Delete line">🗑️</button>
                     </div>
 
@@ -98,7 +113,6 @@
                     <div class="control-row emoji-panel-row">
                         <button id="emoji-prev-btn" title="Previous emojis">◀</button>
                         <div id="emoji-display-area">
-                            <!-- Emojis will be dynamically inserted here -->
                         </div>
                         <button id="emoji-next-btn" title="Next emojis">▶</button>
                     </div>
