@@ -184,8 +184,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 **Author**
 
 **Amir Avni**
+<<<<<<< HEAD
 - LinkedIn: https://www.linkedin.com/in/amir-avni-551a33242/
 - Email: amiravni13@gmail.com
+=======
+- Portfolio: [Your Portfolio URL]
+- LinkedIn: [Your LinkedIn URL]
+- Email: [Your Email]
+>>>>>>> 97ea108336d770e11edb7356b035c2b90cd93e97
 
 ---
 
